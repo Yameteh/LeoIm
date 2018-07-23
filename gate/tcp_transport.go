@@ -20,7 +20,7 @@ func (ttp *TCPTransport) Listen(domain string, port int) {
 	} else {
 		for {
 			if conn, err := listener.Accept(); err == nil {
-				ua := NewUserAgent(conn)
+				ua := uaManager.NewUserAgent(conn)
 				ua.Run()
 			}
 

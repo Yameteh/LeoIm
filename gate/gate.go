@@ -17,6 +17,7 @@ const (
 )
 
 var config *Config
+var uaManager *AgentManager
 
 func main() {
 	//init log
@@ -32,6 +33,7 @@ func main() {
 		return
 	}
 
+	uaManager = NewAgentManager()
 	t := new(TCPTransport)
 	t.Listen(config.Domain,config.Port)
 }

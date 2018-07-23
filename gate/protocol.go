@@ -31,6 +31,7 @@ func (pc *ProtocolCodec) Decode() chan *Protocol {
 			p, err := pc.Reader.Peek(6)
 			if err != nil {
 				glog.Warning("protocol decode peek error : ", err)
+				out <- nil
 				return
 			}
 			protocol := &Protocol{}
@@ -52,6 +53,7 @@ func (pc *ProtocolCodec) Decode() chan *Protocol {
 						pc.Reader.Discard(int(outSize))
 					} else {
 						glog.Warning(err)
+						out <- nil
 						return
 					}
 					break
@@ -62,6 +64,7 @@ func (pc *ProtocolCodec) Decode() chan *Protocol {
 						pc.Reader.Discard(int(s))
 					} else {
 						glog.Warning(err)
+						out <- nil
 						return
 					}
 				}
