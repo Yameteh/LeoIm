@@ -1,13 +1,10 @@
 <component name="libraryTable">
   <library name="GOPATH &lt;LeoIm&gt;">
     <CLASSES>
-      <root url="file://C:/GoPath/src/github.com" />
-      <root url="file://C:/GoPath/src/gopkg.in" />
+      <root url="file://$USER_HOME$/GoPath/src/github.com" />
     </CLASSES>
-    <JAVADOC />
     <SOURCES>
-      <root url="file://C:/GoPath/src/github.com" />
-      <root url="file://C:/GoPath/src/gopkg.in" />
+      <root url="file://$USER_HOME$/GoPath/src/github.com" />
     </SOURCES>
     <excluded>
       <root url="file://$PROJECT_DIR$" />
