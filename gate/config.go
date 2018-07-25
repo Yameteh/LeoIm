@@ -9,12 +9,16 @@ const (
 	INI_SECTION_LISTEN = "listen"
 	INI_KEY_DOMAIN = "domain"
 	INI_KEY_PORT = "port"
+
+	INI_SECTION_STORE_RPC = "rpc_store_server"
 )
 
 type Config struct {
-	Domain string
-	Port   int
-	file   *ini.File
+	Domain      string
+	Port        int
+	StoreDomain string
+	StorePort   int
+	file        *ini.File
 }
 
 func NewConfig(file string) *Config {
@@ -31,16 +35,33 @@ func (cfg *Config) Parse() {
 	if s != nil {
 		if d, err := s.GetKey(INI_KEY_DOMAIN); err == nil {
 			cfg.Domain = d.String()
-		}else {
+		} else {
 			glog.Error(err)
 		}
 
-		if p,err := s.GetKey(INI_KEY_PORT); err == nil {
-			cfg.Port,_ = p.Int()
-		}else {
+		if p, err := s.GetKey(INI_KEY_PORT); err == nil {
+			cfg.Port, _ = p.Int()
+		} else {
 			glog.Error(err)
 		}
 	}
+
+	s = cfg.file.Section(INI_SECTION_STORE_RPC)
+	if s != nil {
+		if d, err := s.GetKey(INI_KEY_DOMAIN); err == nil {
+			cfg.StoreDomain = d.String()
+		} else {
+			glog.Error(err)
+		}
+
+		if p, err := s.GetKey(INI_KEY_PORT); err == nil {
+			cfg.StorePort, _ = p.Int()
+		} else {
+			glog.Error(err)
+		}
+
+	}
+
 }
 
 

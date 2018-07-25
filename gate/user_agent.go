@@ -70,6 +70,8 @@ func (ua *UserAgent) Run() {
 			select {
 			case r := <-readChan:
 				fmt.Println("receive data ",r)
+				u := storeClient.QueryUser("123")
+				fmt.Println(u)
 				if r == nil {
 					ua.Conn.Close()
 					uaManager.delUserAgent(ua)
