@@ -16,6 +16,16 @@ type Protocol struct {
 	Body    string
 }
 
+type AuthRequest struct {
+	User string
+	Response string
+}
+
+type AuthResponse struct {
+	Nonce string
+	Method string
+}
+
 func  ToBytes(p *Protocol) []byte {
 	buf := new(bytes.Buffer)
 	binary.Write(buf, binary.BigEndian, p.Version)
@@ -44,19 +54,6 @@ func main() {
 		fmt.Println("dial error : ", err)
 	}
 
-	for i := 0; i < 10; i++ {
-		p := new(Protocol)
-		p.Version = 2
-		p.Type = uint8(i)
-		s := GetRandomString(int64(i)+10)
-		p.Length = uint32(len(s))
-		p.Body = s
 
-		fmt.Println(p)
-		conn.Write(ToBytes(p))
-	}
-
-	c := make(chan int)
-	<-c
 }
 

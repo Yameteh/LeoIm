@@ -8,6 +8,12 @@ import (
 	"net"
 )
 
+const (
+	PROTOCOL_TYPE_AUTH =  0
+	PROTOCOL_TYPE_AUTHACK = 1
+
+)
+
 type Protocol struct {
 	Version uint8
 	Type    uint8

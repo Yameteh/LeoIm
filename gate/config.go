@@ -9,6 +9,7 @@ const (
 	INI_SECTION_LISTEN = "listen"
 	INI_KEY_DOMAIN = "domain"
 	INI_KEY_PORT = "port"
+	INI_KEY_AUTH_METHOD = "auth_method"
 
 	INI_SECTION_STORE_RPC = "rpc_store_server"
 )
@@ -16,6 +17,7 @@ const (
 type Config struct {
 	Domain      string
 	Port        int
+	AuthMethod  string
 	StoreDomain string
 	StorePort   int
 	file        *ini.File
@@ -44,6 +46,13 @@ func (cfg *Config) Parse() {
 		} else {
 			glog.Error(err)
 		}
+
+		if am,err := s.GetKey(INI_KEY_AUTH_METHOD);err == nil {
+			cfg.AuthMethod = am.String()
+		} else {
+			glog.Error(err)
+		}
+
 	}
 
 	s = cfg.file.Section(INI_SECTION_STORE_RPC)
