@@ -6,12 +6,12 @@ import (
 	"encoding/binary"
 	"github.com/golang/glog"
 	"net"
+	"fmt"
 )
 
 const (
-	PROTOCOL_TYPE_AUTH =  0
+	PROTOCOL_TYPE_AUTH = 0
 	PROTOCOL_TYPE_AUTHACK = 1
-
 )
 
 type Protocol struct {
@@ -42,14 +42,14 @@ func (pc *ProtocolCodec) Decode() chan *Protocol {
 			}
 			protocol := &Protocol{}
 			v, t, l := pc.GetHeader(p)
-			glog.Infof("decode header [version:%d,type=%d,length%d]\n", v, t, l)
+			glog.Infof("decode header [version:%d,type=%d,length=%d]\n", v, t, l)
 			protocol.Version = v
 			protocol.Type = t
 			protocol.Length = l
 			pc.Reader.Discard(6)
 			b := make([]byte, l)
 			buf := bytes.NewBuffer(b)
-
+			buf.Reset()
 			for {
 				var outSize uint32 = l
 				s := pc.Reader.Buffered()
@@ -77,7 +77,7 @@ func (pc *ProtocolCodec) Decode() chan *Protocol {
 
 			}
 			protocol.Body = buf.String()
-			glog.Infof("decode body %s\n",protocol.Body)
+			glog.Infof("decode body %s\n", protocol.Body)
 			out <- protocol
 
 		}
@@ -87,7 +87,11 @@ func (pc *ProtocolCodec) Decode() chan *Protocol {
 
 func (pc *ProtocolCodec) Encode(p *Protocol) {
 	out := pc.ToBytes(p)
-	pc.Writer.Write(out)
+	len,err := pc.Writer.Write(out)
+	fmt.Println("write len ",len)
+	if err != nil {
+		fmt.Println("write error ",err)
+	}
 }
 
 func (pc *ProtocolCodec) GetHeader(b []byte) (uint8, uint8, uint32) {

@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"time"
 	"encoding/json"
-	"github.com/Yameteh/go-voip/gate/base"
 )
 
 const (
@@ -32,7 +31,7 @@ func (am *AgentManager) NewUserAgent(conn net.Conn) *UserAgent {
 		Uuid:uuid.String(),
 		Conn:conn,
 		Codec:NewProtocolCodec(conn),
-		Writer:make(chan *Protocol),
+		Writer:make(chan *Protocol,2),
 		Status:USER_STATUS_UNKOWN}
 	am.putUserAgent(ua)
 	return ua
@@ -97,7 +96,7 @@ func (ua *UserAgent) Auth(r AuthRequest) {
 		p.Type = PROTOCOL_TYPE_AUTHACK
 		j, _ := json.Marshal(rsp)
 		p.Body = string(j)
-		p.Length = len(p.Body)
+		p.Length = uint32(len(p.Body))
 		ua.Writer <- p
 	} else if r.User != "" && r.Response != "" {
 		in := r.User + ":" + ua.Nonce + ":" + "1234"
@@ -109,7 +108,7 @@ func (ua *UserAgent) Auth(r AuthRequest) {
 			p.Type = PROTOCOL_TYPE_AUTHACK
 			j,_:= json.Marshal(rsp)
 			p.Body = string(j)
-			p.Length = len(p.Body)
+			p.Length = uint32(len(p.Body))
 			ua.Writer <- p
 		} else {
 			rsp := new(AuthResponse)
@@ -119,7 +118,7 @@ func (ua *UserAgent) Auth(r AuthRequest) {
 			p.Type = PROTOCOL_TYPE_AUTHACK
 			j,_:= json.Marshal(rsp)
 			p.Body = string(j)
-			p.Length = len(p.Body)
+			p.Length = uint32(len(p.Body))
 			ua.Writer <- p
 		}
 	}
@@ -133,13 +132,16 @@ func (ua *UserAgent) Run() {
 			select {
 			case r := <-readChan:
 				fmt.Println("receive data ", r)
-				ua.HandleProtocol(r)
 				if r == nil {
 					ua.Conn.Close()
 					uaManager.delUserAgent(ua)
 					return
+				}else {
+					ua.HandleProtocol(r)
+
 				}
 			case w := <-ua.Writer:
+				fmt.Println("write data ",w)
 				ua.Codec.Encode(w)
 
 			case <-time.After(20 * time.Second):
