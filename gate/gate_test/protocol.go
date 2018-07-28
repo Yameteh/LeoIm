@@ -4,7 +4,6 @@ import (
 	"encoding/binary"
 	"net"
 	"io"
-	"fmt"
 )
 
 const (
@@ -44,7 +43,6 @@ func (pc *ProtocolCodec) Decode() (*Protocol, error) {
 		return protocol, err
 	}
 	protocol.Body = string(body)
-	fmt.Println("decode protocol ",protocol)
 	return protocol, nil
 }
 

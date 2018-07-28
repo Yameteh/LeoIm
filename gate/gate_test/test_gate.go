@@ -7,14 +7,8 @@ import (
 	"encoding/binary"
 	"time"
 	"math/rand"
+	"encoding/json"
 )
-
-type Protocol struct {
-	Version uint8
-	Type    uint8
-	Length  uint32
-	Body    string
-}
 
 type AuthRequest struct {
 	User string
@@ -49,13 +43,49 @@ func GetRandomString(length int64) string{
 
 func main() {
 	fmt.Println("gate test start")
-	//conn, err := net.Dial("tcp", "localhost:8979")
-	//if err != nil {
-	//	fmt.Println("dial error : ", err)
+	conn, err := net.Dial("tcp", "localhost:8979")
+	if err != nil {
+		fmt.Println("dial error : ", err)
+	}
+
+	//for  i := 1 ; i < 10 ; i++ {
+	//	s := GetRandomString(int64(i))
+	//	p  := new(Protocol)
+	//	p.Version = 1
+	//	p.Type = 12
+	//	p.Body = s
+	//	p.Length = uint32(len(s))
+	//	conn.Write(ToBytes(p))
 	//}
 
 
+	codec := &ProtocolCodec{conn,conn}
+	go func() {
+		for {
+			p, err := codec.Decode()
+			if (err != nil) {
+				return ;
+			}
+			fmt.Println(p)
+		}
+	}()
 
+	p := &Protocol{}
+	p.Version = 1
+	p.Type = 0
+
+	a := &AuthRequest{}
+	a.User="123"
+	a.Response = ""
+	s ,_ := json.Marshal(a)
+	p.Body = string(s)
+	p.Length = uint32(len(p.Body))
+	err = codec.Encode(p)
+	if err != nil {
+		fmt.Println(err)
+	}
+	c := make(chan interface{})
+	<-c
 	
 
 }

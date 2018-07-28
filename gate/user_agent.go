@@ -6,7 +6,6 @@ import (
 	"sync"
 	"github.com/golang/glog"
 	"fmt"
-	"time"
 	"encoding/json"
 )
 
@@ -31,7 +30,7 @@ func (am *AgentManager) NewUserAgent(conn net.Conn) *UserAgent {
 		Uuid:uuid.String(),
 		Conn:conn,
 		Codec:NewProtocolCodec(conn),
-		Writer:make(chan *Protocol,2),
+		Writer:make(chan *Protocol, 2),
 		Status:USER_STATUS_UNKOWN}
 	am.putUserAgent(ua)
 	return ua
@@ -106,7 +105,7 @@ func (ua *UserAgent) Auth(r AuthRequest) {
 			p := new(Protocol)
 			p.Version = 1
 			p.Type = PROTOCOL_TYPE_AUTHACK
-			j,_:= json.Marshal(rsp)
+			j, _ := json.Marshal(rsp)
 			p.Body = string(j)
 			p.Length = uint32(len(p.Body))
 			ua.Writer <- p
@@ -116,7 +115,7 @@ func (ua *UserAgent) Auth(r AuthRequest) {
 			p := new(Protocol)
 			p.Version = 1
 			p.Type = PROTOCOL_TYPE_AUTHACK
-			j,_:= json.Marshal(rsp)
+			j, _ := json.Marshal(rsp)
 			p.Body = string(j)
 			p.Length = uint32(len(p.Body))
 			ua.Writer <- p
@@ -124,37 +123,29 @@ func (ua *UserAgent) Auth(r AuthRequest) {
 	}
 }
 
-
 func (ua *UserAgent) Run() {
 	go func() {
-		readChan := ua.Codec.Decode()
 		for {
-			select {
-			case r := <-readChan:
-				fmt.Println("receive data ", r)
-				if r == nil {
-					ua.Conn.Close()
-					uaManager.delUserAgent(ua)
-					return
-				}else {
-					ua.HandleProtocol(r)
-
-				}
-			case w := <-ua.Writer:
-				fmt.Println("write data ",w)
-				ua.Codec.Encode(w)
-
-			case <-time.After(20 * time.Second):
-				if ua.Status == USER_STATUS_UNKOWN {
-					fmt.Println("auth timeout")
-					ua.Conn.Close()
-					uaManager.delUserAgent(ua)
-					return
-				}
-
+			p, err := ua.Codec.Decode()
+			if err != nil {
+				fmt.Println("ua run ", err)
+				ua.Conn.Close()
+				uaManager.delUserAgent(ua)
+				return
+			}else {
+				ua.HandleProtocol(p)
 			}
+
 		}
 	}()
+
+	go func() {
+		select {
+		case w := <-ua.Writer:
+			ua.Codec.Encode(w)
+		}
+	}()
+
 }
 
 

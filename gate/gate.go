@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"github.com/golang/glog"
-	"fmt"
 )
 
 /**
@@ -41,18 +40,6 @@ func main() {
 	t.Listen(config.Domain,config.Port)
 }
 
-func testProtocol() {
-	p := &Protocol{}
-	p.Version = 1
-	p.Type = 2
-	p.Length = 2123
-	p.Body = "abc"
 
-	codec := &ProtocolCodec{}
-	bytes := codec.ToBytes(p)
-	fmt.Println(bytes)
-	v,t,l := codec.GetHeader(bytes)
-	fmt.Printf("version %d type %d length %d",v,t,l)
-}
 
 
