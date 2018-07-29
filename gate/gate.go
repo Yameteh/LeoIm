@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+
 	"github.com/golang/glog"
 )
 
@@ -17,7 +18,6 @@ const (
 
 var config *Config
 var uaManager *AgentManager
-var storeClient *StoreClient
 
 func main() {
 	//init log
@@ -28,18 +28,13 @@ func main() {
 	config = NewConfig(GATE_CONFIG_INI)
 	if config != nil {
 		config.Parse()
-	}else {
+	} else {
 		glog.Error("gate config ini missed")
 		return
 	}
 
 	uaManager = NewAgentManager()
-	storeClient = NewStoreClient()
 
 	t := new(TCPTransport)
-	t.Listen(config.Domain,config.Port)
+	t.Listen(config.Domain, config.Port)
 }
-
-
-
-

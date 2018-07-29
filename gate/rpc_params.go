@@ -1,6 +1,6 @@
 package main
 
 type User struct {
-	Account string
+	Account  string
 	Password string
 }

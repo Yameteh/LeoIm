@@ -2,13 +2,14 @@ package main
 
 import (
 	"encoding/binary"
-	"net"
 	"io"
-	"fmt"
+	"net"
+
+	"github.com/golang/glog"
 )
 
 const (
-	PROTOCOL_TYPE_AUTH = 0
+	PROTOCOL_TYPE_AUTH    = 0
 	PROTOCOL_TYPE_AUTHACK = 1
 )
 
@@ -44,23 +45,23 @@ func (pc *ProtocolCodec) Decode() (*Protocol, error) {
 		return protocol, err
 	}
 	protocol.Body = string(body)
-	fmt.Println("decode protocol ",protocol)
+	glog.Info("decode protocol ", protocol)
 	return protocol, nil
 }
 
 func (pc *ProtocolCodec) Encode(p *Protocol) error {
-	if err := binary.Write(pc.Writer, binary.BigEndian, p.Version) ; err != nil {
+	if err := binary.Write(pc.Writer, binary.BigEndian, p.Version); err != nil {
 		return err
 	}
-	if err := binary.Write(pc.Writer, binary.BigEndian, p.Type) ; err != nil {
+	if err := binary.Write(pc.Writer, binary.BigEndian, p.Type); err != nil {
 		return err
 	}
 	if err := binary.Write(pc.Writer, binary.BigEndian, p.Length); err != nil {
 		return err
 	}
-	if err := binary.Write(pc.Writer, binary.BigEndian, []byte(p.Body)) ;err != nil {
+	if err := binary.Write(pc.Writer, binary.BigEndian, []byte(p.Body)); err != nil {
 		return err
 	}
+	glog.Info("encode protocol ", p)
 	return nil
 }
-
