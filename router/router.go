@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	STORE_CONFIG_INI = "store.ini"
+	ROUTER_CONFIG_INI = "router.ini"
 )
 
 var config *Config
@@ -20,16 +20,16 @@ func main() {
 	flag.Parse()
 	defer glog.Flush()
 
-	config = NewConfig(STORE_CONFIG_INI)
-
+	//parse gate config
+	config = NewConfig(ROUTER_CONFIG_INI)
 	if config != nil {
 		config.Parse()
 	} else {
-		glog.Error("store config ini missed")
+		glog.Error("router config ini missed")
 		return
 	}
 
-	rpcSever := NewStoreRpcServer()
+	rpcSever := NewRouterRpcServer()
 	rpc.Register(rpcSever)
 	rpc.HandleHTTP()
 	addr := fmt.Sprintf("%s:%d", config.Domain, config.Port)
