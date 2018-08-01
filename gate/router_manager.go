@@ -15,10 +15,22 @@ func NewRouterManager(count int) *RouterManager {
 	return &RouterManager{count, 0, -1}
 }
 
+func (rm *RouterManager) ChangeCurIndex() {
+	rm.curIndex ++
+	if rm.curIndex >= rm.RouterCount {
+		rm.curIndex = 0
+	}
+
+}
+
 func (rm *RouterManager) PublishMessage(p *Protocol) {
 	var client *rpc.Client
 	var err error
-	defer client.Close()
+	defer func() {
+		if client != nil {
+			client.Close()
+		}
+	}()
 	for {
 		client, err = rpc.DialHTTP("tcp", config.RouterServer[rm.curIndex])
 		if err == nil {
@@ -28,19 +40,18 @@ func (rm *RouterManager) PublishMessage(p *Protocol) {
 			message.Type = p.Type
 			message.Body = p.Body
 			var ret int
-			client.Call("RouterRpcServer.HandleMessage", message,&ret)
+			client.Call("RouterRpcServer.HandleMessage", message, &ret)
 			if ret != 0 {
 				glog.Error("router server publish response error ")
 			}
+			rm.ChangeCurIndex()
+			return
 		} else {
 			if rm.curIndex == rm.lastIndex {
 				glog.Error("no router server available when publish")
 				return
 			}
-		}
-		rm.curIndex ++
-		if rm.curIndex >= len(config.RouterServer) {
-			rm.curIndex = 0
+			rm.ChangeCurIndex()
 		}
 
 	}

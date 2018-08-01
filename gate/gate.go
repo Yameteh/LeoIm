@@ -18,6 +18,7 @@ const (
 
 var config *Config
 var uaManager *AgentManager
+var routerManager *RouterManager
 
 func main() {
 	//init log
@@ -34,7 +35,7 @@ func main() {
 	}
 
 	uaManager = NewAgentManager()
-
+	routerManager = NewRouterManager(len(config.RouterServer))
 	t := new(TCPTransport)
 	t.Listen(config.Domain, config.Port)
 

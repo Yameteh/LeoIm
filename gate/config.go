@@ -14,7 +14,7 @@ const (
 	INI_KEY_AUTH_METHOD = "auth_method"
 	INI_SECTION_REDIS   = "redis_server"
 	INI_SECTION_ROUTER  = "router_server"
-	INI_KEY_ADDRESS     = "address"
+	INI_KEY_ADDRESS     = "domains"
 )
 
 type Config struct {

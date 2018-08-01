@@ -72,7 +72,7 @@ func main() {
 
 	p := &Protocol{}
 	p.Version = 1
-	p.Type = 0
+	p.Type = 3
 
 	a := &AuthRequest{}
 	a.User="123"
