@@ -94,7 +94,7 @@ func (ua *UserAgent) Auth(r AuthRequest) {
 		ua.Writer <- p
 	} else if r.User != "" && r.Response != "" {
 		in := r.User + ":" + ua.Nonce + ":" + "1234"
-		if r.Response == GetMd5(in) {
+		if r.Response == in{
 			rsp := new(AuthResponse)
 			rsp.Code = AUTHACL_CODE_OK
 			p := CreateProtocolMsg(1, PROTOCOL_TYPE_AUTHACK, rsp)
