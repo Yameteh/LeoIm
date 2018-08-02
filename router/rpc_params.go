@@ -5,3 +5,4 @@ type Message struct {
 	Type    uint8
 	Body    string
 }
+

@@ -65,7 +65,6 @@ type UserAgent struct {
 	Writer chan *Protocol
 	Status uint
 	Nonce  string
-	User   *User
 }
 
 func (ua *UserAgent) HandleProtocol(p *Protocol) {

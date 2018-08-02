@@ -8,6 +8,7 @@ import (
 	"net/rpc"
 
 	"github.com/golang/glog"
+	"time"
 )
 
 const (
@@ -28,7 +29,6 @@ func main() {
 		glog.Error("router config ini missed")
 		return
 	}
-
 	rpcSever := NewRouterRpcServer()
 	rpc.Register(rpcSever)
 	rpc.HandleHTTP()
