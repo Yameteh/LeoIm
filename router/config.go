@@ -3,17 +3,22 @@ package main
 import (
 	"github.com/golang/glog"
 	"gopkg.in/ini.v1"
+	"strings"
 )
 
 const (
 	INI_SECTION_LISTEN = "listen"
 	INI_KEY_DOMAIN     = "domain"
 	INI_KEY_PORT       = "port"
+
+	INI_SECTION_GATE = "gate_rpc_server"
+	INI_KEY_DOMAINS = "domains"
 )
 
 type Config struct {
 	Domain string
 	Port   int
+	GateServer []string
 	file   *ini.File
 }
 
@@ -38,6 +43,15 @@ func (cfg *Config) Parse() {
 		if p, err := s.GetKey(INI_KEY_PORT); err == nil {
 			cfg.Port, _ = p.Int()
 		} else {
+			glog.Error(err)
+		}
+	}
+
+	s = cfg.file.Section(INI_SECTION_GATE)
+	if s != nil {
+		if ds, err := s.GetKey(INI_KEY_DOMAINS); err == nil {
+			config.GateServer = strings.Split(ds.String(),",")
+		}else {
 			glog.Error(err)
 		}
 	}

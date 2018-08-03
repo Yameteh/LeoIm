@@ -4,6 +4,10 @@ import (
 	"flag"
 
 	"github.com/golang/glog"
+	"net/rpc"
+	"fmt"
+	"net"
+	"net/http"
 )
 
 /**
@@ -36,7 +40,27 @@ func main() {
 
 	uaManager = NewAgentManager()
 	routerManager = NewRouterManager(len(config.RouterServer))
+
+	setupGateRpcServer()
+
 	t := new(TCPTransport)
 	t.Listen(config.Domain, config.Port)
+
+}
+
+func setupGateRpcServer() {
+	go func() {
+		rpcSever := NewGateRpcServer()
+		rpc.Register(rpcSever)
+		rpc.HandleHTTP()
+		addr := fmt.Sprintf("%s:%d", config.Domain, config.RpcPort)
+		fmt.Println(addr)
+		l, err := net.Listen("tcp", addr)
+		if err != nil {
+			glog.Error(err)
+		} else {
+			http.Serve(l, nil)
+		}
+	}()
 
 }

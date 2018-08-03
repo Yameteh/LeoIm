@@ -8,7 +8,6 @@ import (
 	"net/rpc"
 
 	"github.com/golang/glog"
-	"time"
 )
 
 const (
@@ -16,6 +15,7 @@ const (
 )
 
 var config *Config
+var gateManager *GateManager
 
 func main() {
 	flag.Parse()
@@ -29,11 +29,23 @@ func main() {
 		glog.Error("router config ini missed")
 		return
 	}
-	rpcSever := NewRouterRpcServer()
-	rpc.Register(rpcSever)
-	rpc.HandleHTTP()
-	addr := fmt.Sprintf("%s:%d", config.Domain, config.Port)
-	l, _ := net.Listen("tcp", addr)
-	http.Serve(l, nil)
+
+	gateManager = NewGateManager()
+
+	setupRouterRpcServer()
+
+	c := make(chan interface{})
+	<-c
+}
+
+func setupRouterRpcServer() {
+	go func() {
+		rpcSever := NewRouterRpcServer()
+		rpc.Register(rpcSever)
+		rpc.HandleHTTP()
+		addr := fmt.Sprintf("%s:%d", config.Domain, config.Port)
+		l, _ := net.Listen("tcp", addr)
+		http.Serve(l, nil)
+	}()
 
 }

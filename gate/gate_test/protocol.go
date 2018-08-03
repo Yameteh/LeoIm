@@ -9,6 +9,9 @@ import (
 const (
 	PROTOCOL_TYPE_AUTH = 0
 	PROTOCOL_TYPE_AUTHACK = 1
+	PROTOCOL_TYPE_MSG = 2
+	PROTOCOL_TYPE_MSGACK = 3
+	PROTOCOL_TYPE_MSGSYNC = 4
 )
 
 type Protocol struct {

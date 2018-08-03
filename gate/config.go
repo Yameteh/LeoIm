@@ -8,13 +8,14 @@ import (
 )
 
 const (
-	INI_SECTION_LISTEN  = "listen"
-	INI_KEY_DOMAIN      = "domain"
-	INI_KEY_PORT        = "port"
+	INI_SECTION_LISTEN = "listen"
+	INI_KEY_DOMAIN = "domain"
+	INI_KEY_PORT = "port"
 	INI_KEY_AUTH_METHOD = "auth_method"
-	INI_SECTION_REDIS   = "redis_server"
-	INI_SECTION_ROUTER  = "router_server"
-	INI_KEY_ADDRESS     = "domains"
+	INI_KEY_RPC_PORT = "rpc_port"
+	INI_SECTION_REDIS = "redis_server"
+	INI_SECTION_ROUTER = "router_server"
+	INI_KEY_ADDRESS = "domains"
 )
 
 type Config struct {
@@ -24,6 +25,7 @@ type Config struct {
 	RedisDomain  string
 	RedisPort    int
 	RouterServer []string
+	RpcPort      int
 	file         *ini.File
 }
 
@@ -47,6 +49,12 @@ func (cfg *Config) Parse() {
 
 		if p, err := s.GetKey(INI_KEY_PORT); err == nil {
 			cfg.Port, _ = p.Int()
+		} else {
+			glog.Error(err)
+		}
+
+		if rp, err := s.GetKey(INI_KEY_RPC_PORT); err == nil {
+			cfg.RpcPort, _ = rp.Int()
 		} else {
 			glog.Error(err)
 		}

@@ -7,5 +7,12 @@ type Message struct {
 	Body    string
 }
 
+type ToProtocol struct {
+	To string
+	Version uint8
+	Type uint8
+	Length uint32
+	Body string
+}
 
 

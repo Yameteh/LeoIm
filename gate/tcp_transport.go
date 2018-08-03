@@ -13,6 +13,7 @@ type TCPTransport struct {
 
 
 func (ttp *TCPTransport) Listen(domain string, port int) {
+	fmt.Println("listen")
 	glog.Infof("tcp transport listen %s:%d\n",domain,port)
 	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d",domain,port))
 	if err != nil {

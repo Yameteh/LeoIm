@@ -34,6 +34,14 @@ func ToBytes(p *Protocol) []byte {
 	return buf.Bytes()
 }
 
+type MessageBody struct {
+	From string
+	To string
+	Time int64
+	MimeType string
+	Content string
+}
+
 func GetRandomString(length int64) string {
 	str := "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	bytes := []byte(str)
@@ -63,7 +71,8 @@ func main() {
 			switch p.Type {
 			case 1:
 				reAuth(p)
-
+			case PROTOCOL_TYPE_MSGSYNC:
+				fmt.Println("msg sync ",p)
 			}
 		}
 	}()
@@ -83,8 +92,14 @@ func main() {
 					} else {
 						fmt.Println("ps : auth xx xx")
 					}
-
+				case "msg":
+					if len(cmds) == 3 {
+						Msg(cmds[1],cmds[2])
+					}else {
+						fmt.Println("ps : msg xx xxx")
+					}
 				}
+
 			}
 		}
 	}
@@ -157,3 +172,17 @@ func reAuth(in *Protocol) {
 
 }
 
+func Msg(uuid string,content string) {
+	message := new(MessageBody)
+	message.From = account
+	message.To = uuid
+	message.MimeType = "text/plain"
+	message.Time = time.Now().Unix()
+	fmt.Println("send time ",message.Time)
+	message.Content = content
+	p := CreateProtocolMsg(1,PROTOCOL_TYPE_MSG,message)
+	err := codec.Encode(p)
+	if err != nil {
+		fmt.Println(err)
+	}
+}

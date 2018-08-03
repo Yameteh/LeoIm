@@ -4,10 +4,9 @@ import (
 	"encoding/json"
 	"net"
 	"sync"
-	"time"
-
 	"github.com/golang/glog"
 	"github.com/satori/go.uuid"
+	"time"
 )
 
 const (
@@ -26,22 +25,20 @@ func NewAgentManager() *AgentManager {
 }
 
 func (am *AgentManager) NewUserAgent(conn net.Conn) *UserAgent {
-	uuid, _ := uuid.NewV4()
 	ua := &UserAgent{
-		Uuid:   uuid.String(),
 		Conn:   conn,
 		Codec:  NewProtocolCodec(conn),
 		Writer: make(chan *Protocol),
 		Status: USER_STATUS_UNKOWN}
-	am.putUserAgent(ua)
+	//am.putUserAgent(ua)
 	return ua
 }
 
 func (am *AgentManager) putUserAgent(ua *UserAgent) {
 	am.Lock()
 	defer am.Unlock()
-	glog.Infof("user agent %s added", ua.Uuid)
-	am.agents[ua.Uuid] = ua
+	glog.Infof("user agent %s added", ua.User.Uuid)
+	am.agents[ua.User.Uuid] = ua
 }
 
 func (am *AgentManager) getUserAgent(uuid string) *UserAgent {
@@ -52,19 +49,21 @@ func (am *AgentManager) getUserAgent(uuid string) *UserAgent {
 }
 
 func (am *AgentManager) delUserAgent(ua *UserAgent) {
-	am.Lock()
-	defer am.Unlock()
-	glog.Infof("user agent %s deleted", ua.Uuid)
-	delete(am.agents, ua.Uuid)
+	if ua.User != nil {
+		am.Lock()
+		defer am.Unlock()
+		glog.Infof("user agent %s deleted", ua.User.Uuid)
+		delete(am.agents, ua.User.Uuid)
+	}
 }
 
 type UserAgent struct {
-	Uuid   string
 	Conn   net.Conn
 	Codec  *ProtocolCodec
 	Writer chan *Protocol
 	Status uint
 	Nonce  string
+	User   *User
 }
 
 func (ua *UserAgent) HandleProtocol(p *Protocol) {
@@ -92,12 +91,29 @@ func (ua *UserAgent) Auth(r AuthRequest) {
 		p := CreateProtocolMsg(1, PROTOCOL_TYPE_AUTHACK, rsp)
 		ua.Writer <- p
 	} else if r.User != "" && r.Response != "" {
-		in := r.User + ":" + ua.Nonce + ":" + "1234"
-		if r.Response == in{
-			rsp := new(AuthResponse)
-			rsp.Code = AUTHACL_CODE_OK
-			p := CreateProtocolMsg(1, PROTOCOL_TYPE_AUTHACK, rsp)
-			ua.Writer <- p
+		user := RedisQueryUser(r.User)
+		var in string
+		if user != nil {
+			in = r.User + ":" + ua.Nonce + ":" + user.Password
+		} else {
+			in = ""
+		}
+		if r.Response == in {
+			token, _ := uuid.NewV1()
+			user.Token = token.String()
+			ua.User = user
+			ua.Status = USER_STATUS_ONLINE
+			uaManager.putUserAgent(ua)
+			err := RedisUpdateUser(user)
+			if err != nil {
+				glog.Error("redis update user error ", err)
+			} else {
+				rsp := new(AuthResponse)
+				rsp.Code = AUTHACL_CODE_OK
+				p := CreateProtocolMsg(1, PROTOCOL_TYPE_AUTHACK, rsp)
+				ua.Writer <- p
+			}
+
 		} else {
 			rsp := new(AuthResponse)
 			rsp.Code = AUTHACL_CODE_ERROR
@@ -110,6 +126,7 @@ func (ua *UserAgent) Auth(r AuthRequest) {
 func (ua *UserAgent) Close() {
 	ua.Writer <- nil
 	ua.Conn.Close()
+	ua.Status = USER_STATUS_UNKOWN
 	uaManager.delUserAgent(ua)
 }
 
