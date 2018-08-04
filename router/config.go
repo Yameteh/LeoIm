@@ -8,18 +8,27 @@ import (
 
 const (
 	INI_SECTION_LISTEN = "listen"
-	INI_KEY_DOMAIN     = "domain"
-	INI_KEY_PORT       = "port"
+	INI_KEY_DOMAIN = "domain"
+	INI_KEY_PORT = "port"
 
 	INI_SECTION_GATE = "gate_rpc_server"
 	INI_KEY_DOMAINS = "domains"
+
+	INI_SECTION_POSTGRES = "postgres"
+	INI_KEY_DB = "database"
+	INI_KEY_USER = "user"
+	INI_KEY_PASSWORD = "password"
 )
 
 type Config struct {
-	Domain string
-	Port   int
+	Domain     string
+	Port       int
 	GateServer []string
-	file   *ini.File
+	PqDomain   string
+	PqDb       string
+	PqUser     string
+	PqPwd      string
+	file       *ini.File
 }
 
 func NewConfig(file string) *Config {
@@ -50,10 +59,38 @@ func (cfg *Config) Parse() {
 	s = cfg.file.Section(INI_SECTION_GATE)
 	if s != nil {
 		if ds, err := s.GetKey(INI_KEY_DOMAINS); err == nil {
-			config.GateServer = strings.Split(ds.String(),",")
-		}else {
+			config.GateServer = strings.Split(ds.String(), ",")
+		} else {
 			glog.Error(err)
 		}
+	}
+
+	s = cfg.file.Section(INI_SECTION_POSTGRES)
+	if s != nil {
+		if d, err := s.GetKey(INI_KEY_DOMAIN); err == nil {
+			config.PqDomain = d.String()
+		} else {
+			glog.Error(err)
+		}
+
+		if db, err := s.GetKey(INI_KEY_DB); err == nil {
+			config.PqDb = db.String()
+		} else {
+			glog.Error(err)
+		}
+
+		if u, err := s.GetKey(INI_KEY_USER); err == nil {
+			config.PqUser = u.String()
+		} else {
+			glog.Error(err)
+		}
+
+		if p, err := s.GetKey(INI_KEY_PASSWORD); err == nil {
+			config.PqPwd = p.String()
+		} else {
+			glog.Error(err)
+		}
+
 	}
 
 }

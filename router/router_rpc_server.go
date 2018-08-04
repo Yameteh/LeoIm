@@ -9,14 +9,18 @@ import (
 )
 
 type RouterRpcServer struct {
+	sm *StoreManager
 }
 
 func NewRouterRpcServer() *RouterRpcServer {
-	return &RouterRpcServer{}
+	return &RouterRpcServer{NewStoreManager()}
 }
 
-func (rrs *RouterRpcServer) saveMessage(body *MessageBody) {
-
+func (rrs *RouterRpcServer) SaveMessage(body *MessageBody) {
+	err := rrs.sm.Insert(body)
+	if err != nil {
+		glog.Error(err)
+	}
 }
 
 
@@ -29,7 +33,7 @@ func (rrs *RouterRpcServer) HandleMessage(msg *Message, ret *int) error {
 		if err != nil {
 			return err
 		}
-		rrs.saveMessage(m)
+		rrs.SaveMessage(m)
 
 		tp := new(ToProtocol)
 		tp.To = m.To

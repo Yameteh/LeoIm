@@ -35,6 +35,7 @@ func ToBytes(p *Protocol) []byte {
 }
 
 type MessageBody struct {
+	MsgType int
 	From string
 	To string
 	Time int64
@@ -174,6 +175,7 @@ func reAuth(in *Protocol) {
 
 func Msg(uuid string,content string) {
 	message := new(MessageBody)
+	message.MsgType = 1
 	message.From = account
 	message.To = uuid
 	message.MimeType = "text/plain"
