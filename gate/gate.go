@@ -54,12 +54,12 @@ func setupGateRpcServer() {
 		rpc.Register(rpcSever)
 		rpc.HandleHTTP()
 		addr := fmt.Sprintf("%s:%d", config.Domain, config.RpcPort)
-		fmt.Println(addr)
 		l, err := net.Listen("tcp", addr)
 		if err != nil {
 			glog.Error(err)
 		} else {
 			http.Serve(l, nil)
+			glog.Info("gate rpc server start with address ",addr)
 		}
 	}()
 

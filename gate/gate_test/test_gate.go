@@ -74,6 +74,8 @@ func main() {
 				reAuth(p)
 			case PROTOCOL_TYPE_MSGSYNC:
 				fmt.Println("msg sync ",p)
+			case PROTOCOL_TYPE_MSG:
+				fmt.Println("received msg ",p)
 			}
 		}
 	}()

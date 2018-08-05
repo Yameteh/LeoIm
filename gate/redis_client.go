@@ -13,7 +13,7 @@ type User struct {
 }
 
 func RedisUpdateUser(u *User) error {
-	glog.Info("update user ", u.Uuid)
+	glog.Info("redis update user ", u.Uuid)
 	c, err := redis.Dial("tcp", fmt.Sprintf("%s:%d", config.RedisDomain, config.RedisPort))
 	if err != nil {
 		return err
@@ -25,7 +25,7 @@ func RedisUpdateUser(u *User) error {
 }
 
 func RedisQueryUser(uuid string) *User {
-	glog.Info("query user ", uuid)
+	glog.Info("redis query user ", uuid)
 	c, err := redis.Dial("tcp", fmt.Sprintf("%s:%d", config.RedisDomain, config.RedisPort))
 	if err != nil {
 		glog.Error(err)

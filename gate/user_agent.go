@@ -30,7 +30,6 @@ func (am *AgentManager) NewUserAgent(conn net.Conn) *UserAgent {
 		Codec:  NewProtocolCodec(conn),
 		Writer: make(chan *Protocol),
 		Status: USER_STATUS_UNKOWN}
-	//am.putUserAgent(ua)
 	return ua
 }
 
@@ -151,7 +150,7 @@ func (ua *UserAgent) Run() {
 				if w != nil {
 					ua.Codec.Encode(w)
 				} else {
-					glog.Error("return when ua write nil ")
+					glog.Error("ua close write goroutine ")
 					return
 				}
 			}

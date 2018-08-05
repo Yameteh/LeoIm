@@ -46,6 +46,7 @@ func setupRouterRpcServer() {
 		addr := fmt.Sprintf("%s:%d", config.Domain, config.Port)
 		l, _ := net.Listen("tcp", addr)
 		http.Serve(l, nil)
+		glog.Info("router rpc server start with address ",addr)
 	}()
 
 }
