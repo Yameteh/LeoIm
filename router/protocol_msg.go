@@ -10,3 +10,8 @@ type MessageBody struct {
 	Content string
 }
 
+type SyncResponse struct {
+	Server string
+	Time  int64
+}
+

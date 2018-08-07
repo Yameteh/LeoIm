@@ -17,6 +17,9 @@ type AuthResponse struct {
 	Code   int
 	Nonce  string
 	Method string
+	Token string
 }
+
+
 
 

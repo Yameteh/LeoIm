@@ -53,10 +53,10 @@ func (sm *StoreManager) Insert(data interface{}) error {
 	}
 }
 
-func (sm *StoreManager) QueryMessage(user string,time int64, out []MessageBody) error{
+func (sm *StoreManager) QueryMessage(user string,time int64, out *[]MessageBody) error{
 	if sm.Engine != nil {
 		if sm.connected {
-			err := sm.Engine.Where("to=? and time>=?",user,time).Find(&out)
+			err := sm.Engine.Where("message_body.to=? AND message_body.time>=?",user,time).Find(out)
 			return err
 		}else {
 			return errors.New("xorm query message when not connect database")

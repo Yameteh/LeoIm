@@ -109,6 +109,7 @@ func (ua *UserAgent) Auth(r AuthRequest) {
 			} else {
 				rsp := new(AuthResponse)
 				rsp.Code = AUTHACL_CODE_OK
+				rsp.Token = user.Token
 				p := CreateProtocolMsg(1, PROTOCOL_TYPE_AUTHACK, rsp)
 				ua.Writer <- p
 			}

@@ -46,11 +46,14 @@ func (rws *RouterWebServer) sync(w http.ResponseWriter, u string, time string) {
 	t, err := strconv.ParseInt(time, 10, 64)
 	if err == nil {
 		var o []MessageBody
-		err := storeManager.QueryMessage(u, t, o)
+		err := storeManager.QueryMessage(u, t, &o)
 		if err == nil {
 			ob, err := json.Marshal(o)
 			if err == nil {
-				w.Write(ob)
+				_,err := w.Write(ob)
+				if err != nil {
+					glog.Error(err)
+				}
 			} else {
 				glog.Error(err)
 			}

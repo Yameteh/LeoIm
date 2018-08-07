@@ -38,7 +38,11 @@ func (rrs *RouterRpcServer) HandleMessage(msg *Message, ret *int) error {
 			tp.To = m.To
 			tp.Version = msg.Version
 			tp.Type = 4
-			tp.Body = fmt.Sprintf("{time:%d}", m.Time)
+			sr := &SyncResponse{}
+			sr.Time = m.Time
+			sr.Server = fmt.Sprintf("%s:%d",config.WebDomain,config.WebPort);
+			s,_ := json.Marshal(sr)
+			tp.Body = string(s)
 			tp.Length = uint32(len(tp.Body))
 			gateManager.PublishProtocol(tp)
 		}else {

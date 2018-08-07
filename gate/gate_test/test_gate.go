@@ -12,6 +12,9 @@ import (
 	"os"
 	"strings"
 	"encoding/json"
+	"net/http"
+	"strconv"
+	"io/ioutil"
 )
 
 type AuthRequest struct {
@@ -23,6 +26,7 @@ type AuthResponse struct {
 	Code   int
 	Nonce  string
 	Method string
+	Token string
 }
 
 func ToBytes(p *Protocol) []byte {
@@ -42,6 +46,12 @@ type MessageBody struct {
 	MimeType string
 	Content string
 }
+
+type SyncResponse struct {
+	Server string
+	Time  int64
+}
+
 
 func GetRandomString(length int64) string {
 	str := "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -74,6 +84,7 @@ func main() {
 				reAuth(p)
 			case PROTOCOL_TYPE_MSGSYNC:
 				fmt.Println("msg sync ",p)
+				sync(p)
 			case PROTOCOL_TYPE_MSG:
 				fmt.Println("received msg ",p)
 			}
@@ -106,30 +117,38 @@ func main() {
 			}
 		}
 	}
-
-	//
-	//p := &Protocol{}
-	//p.Version = 1
-	//p.Type = 3
-	//
-	//a := &AuthRequest{}
-	//a.User="123"
-	//a.Response = ""
-	//s ,_ := json.Marshal(a)
-	//p.Body = string(s)
-	//p.Length = uint32(len(p.Body))
-	//err = codec.Encode(p)
-	//if err != nil {
-	//	fmt.Println(err)
-	//}
-	//c := make(chan interface{})
-	//<-c
-
-
 }
+
+func sync(p *Protocol) {
+	a := &SyncResponse{}
+	json.Unmarshal([]byte(p.Body),a)
+	url :=  fmt.Sprintf("http://%s/sync/",a.Server)
+	r,err  := http.NewRequest("GET",url,nil)
+	if err != nil {
+		fmt.Println(err)
+	}
+	r.Header.Add("Authorization","Basic "+GetBase64(account+":"+token))
+	r.Header.Add("SyncTime",strconv.FormatInt(a.Time,10))
+	rsp,err  := http.DefaultClient.Do(r)
+	if err != nil {
+		fmt.Println(err)
+	}else {
+		fmt.Println(rsp.StatusCode,rsp.ContentLength)
+		defer rsp.Body.Close()
+		a,err := ioutil.ReadAll(rsp.Body)
+		if err == nil {
+			fmt.Println(string(a))
+		}else {
+			fmt.Println(err)
+		}
+
+	}
+}
+
 
 var account string
 var password string
+var token string
 var codec *ProtocolCodec
 
 func Auth(user string, pwd string) {
@@ -167,12 +186,11 @@ func reAuth(in *Protocol) {
 			fmt.Println(err)
 		}
 	}else if ar.Code == 200 {
-		fmt.Println("auth success")
+		fmt.Println("auth success token ",ar.Token)
+		token = ar.Token
 	}else if ar.Code == 402 {
 		fmt.Println("auth failed")
 	}
-
-
 }
 
 func Msg(uuid string,content string) {
