@@ -16,6 +16,7 @@ const (
 
 var config *Config
 var gateManager *GateManager
+var storeManager *StoreManager
 
 func main() {
 	flag.Parse()
@@ -31,11 +32,20 @@ func main() {
 	}
 
 	gateManager = NewGateManager()
-
+	storeManager = NewStoreManager()
+	err := storeManager.Init()
+	if err != nil {
+		glog.Error(err)
+	}
 	setupRouterRpcServer()
-
+	setupWebServer()
 	c := make(chan interface{})
 	<-c
+}
+
+func setupWebServer() {
+	webServer := NewRouterWebServer()
+	webServer.Serve()
 }
 
 func setupRouterRpcServer() {

@@ -9,20 +9,14 @@ import (
 )
 
 type RouterRpcServer struct {
-	sm *StoreManager
 }
 
 func NewRouterRpcServer() *RouterRpcServer {
-	m := NewStoreManager()
-	err := m.Init()
-	if err != nil {
-		glog.Error(err)
-	}
-	return &RouterRpcServer{m}
+	return &RouterRpcServer{}
 }
 
 func (rrs *RouterRpcServer) saveMessage(body *MessageBody) bool {
-	err := rrs.sm.Insert(body)
+	err := storeManager.Insert(body)
 	if err != nil {
 		glog.Error(err)
 		return false

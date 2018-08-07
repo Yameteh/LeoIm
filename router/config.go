@@ -18,6 +18,11 @@ const (
 	INI_KEY_DB = "database"
 	INI_KEY_USER = "user"
 	INI_KEY_PASSWORD = "password"
+
+	INI_SECTION_WEB = "web"
+
+	INI_SECTION_REDIS = "redis_server"
+
 )
 
 type Config struct {
@@ -28,6 +33,10 @@ type Config struct {
 	PqDb       string
 	PqUser     string
 	PqPwd      string
+	WebDomain  string
+	WebPort    int
+	RedisDomain string
+	RedisPort  int
 	file       *ini.File
 }
 
@@ -59,7 +68,7 @@ func (cfg *Config) Parse() {
 	s = cfg.file.Section(INI_SECTION_GATE)
 	if s != nil {
 		if ds, err := s.GetKey(INI_KEY_DOMAINS); err == nil {
-			config.GateServer = strings.Split(ds.String(), ",")
+			cfg.GateServer = strings.Split(ds.String(), ",")
 		} else {
 			glog.Error(err)
 		}
@@ -68,25 +77,56 @@ func (cfg *Config) Parse() {
 	s = cfg.file.Section(INI_SECTION_POSTGRES)
 	if s != nil {
 		if d, err := s.GetKey(INI_KEY_DOMAIN); err == nil {
-			config.PqDomain = d.String()
+			cfg.PqDomain = d.String()
 		} else {
 			glog.Error(err)
 		}
 
 		if db, err := s.GetKey(INI_KEY_DB); err == nil {
-			config.PqDb = db.String()
+			cfg.PqDb = db.String()
 		} else {
 			glog.Error(err)
 		}
 
 		if u, err := s.GetKey(INI_KEY_USER); err == nil {
-			config.PqUser = u.String()
+			cfg.PqUser = u.String()
 		} else {
 			glog.Error(err)
 		}
 
 		if p, err := s.GetKey(INI_KEY_PASSWORD); err == nil {
-			config.PqPwd = p.String()
+			cfg.PqPwd = p.String()
+		} else {
+			glog.Error(err)
+		}
+
+	}
+
+	s = cfg.file.Section(INI_SECTION_WEB)
+	if s != nil {
+		if d, err := s.GetKey(INI_KEY_DOMAIN); err == nil {
+			cfg.WebDomain = d.String()
+		} else {
+			glog.Error(err)
+		}
+
+		if p, err := s.GetKey(INI_KEY_PORT); err == nil {
+			cfg.WebPort, _ = p.Int()
+		} else {
+			glog.Error(err)
+		}
+	}
+
+	s = cfg.file.Section(INI_SECTION_REDIS)
+	if s != nil {
+		if d, err := s.GetKey(INI_KEY_DOMAIN); err == nil {
+			cfg.RedisDomain = d.String()
+		} else {
+			glog.Error(err)
+		}
+
+		if p, err := s.GetKey(INI_KEY_PORT); err == nil {
+			cfg.RedisPort, _ = p.Int()
 		} else {
 			glog.Error(err)
 		}
