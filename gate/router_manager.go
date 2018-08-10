@@ -3,16 +3,18 @@ package main
 import (
 	"net/rpc"
 	"github.com/golang/glog"
+	"sync"
 )
 
 type RouterManager struct {
+	sync.Mutex
 	RouterCount int
 	curIndex    int
 	lastIndex   int
 }
 
 func NewRouterManager(count int) *RouterManager {
-	return &RouterManager{count, 0, -1}
+	return &RouterManager{RouterCount:count, curIndex:0,lastIndex: -1}
 }
 
 func (rm *RouterManager) ChangeCurIndex() {
@@ -30,7 +32,9 @@ func (rm *RouterManager) PublishMessage(p *Protocol) {
 		if client != nil {
 			client.Close()
 		}
+		rm.Unlock()
 	}()
+	rm.Lock()
 	for {
 		client, err = rpc.DialHTTP("tcp", config.RouterServer[rm.curIndex])
 		if err == nil {

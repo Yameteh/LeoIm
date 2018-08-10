@@ -67,7 +67,7 @@ func GetRandomString(length int64) string {
 
 func main() {
 	fmt.Println("gate test start")
-	conn, err := net.Dial("tcp", "localhost:8979")
+	conn, err := net.Dial("tcp", "172.25.1.137:8979")
 	if err != nil {
 		fmt.Println("dial error : ", err)
 		return

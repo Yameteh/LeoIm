@@ -3,7 +3,7 @@ package main
 type Message struct {
 	Version uint8
 	Type    uint8
-	Body    string
+	Body    []byte
 }
 
 type ToProtocol struct {
@@ -11,5 +11,5 @@ type ToProtocol struct {
 	Version uint8
 	Type uint8
 	Length uint32
-	Body string
+	Body []byte
 }

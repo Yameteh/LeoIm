@@ -13,8 +13,8 @@ func GetMd5(in string) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func GetBase64(in string) string {
-	return base64.StdEncoding.EncodeToString([]byte(in))
+func GetBase64(in []byte) string {
+	return base64.StdEncoding.EncodeToString(in)
 }
 
 func CreateProtocolMsg(v uint8, t uint8, msg interface{}) *Protocol {
@@ -23,8 +23,8 @@ func CreateProtocolMsg(v uint8, t uint8, msg interface{}) *Protocol {
 	p.Type = t
 
 	if j, err := json.Marshal(msg); err == nil {
-		p.Body = string(j)
-		p.Length = uint32(len(p.Body))
+		p.Body = j
+		p.Length = uint32(len(j))
 		return p
 	} else {
 		return nil

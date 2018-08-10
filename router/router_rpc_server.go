@@ -30,7 +30,8 @@ func (rrs *RouterRpcServer) HandleMessage(msg *Message, ret *int) error {
 		switch msg.Type {
 		case 2:
 			m := new(MessageBody)
-			err := json.Unmarshal([]byte(msg.Body), m)
+			glog.Info("HandleMessage ",msg.Body)
+			err := json.Unmarshal(msg.Body, m)
 			if err != nil {
 				glog.Error(err)
 				return;
@@ -44,7 +45,7 @@ func (rrs *RouterRpcServer) HandleMessage(msg *Message, ret *int) error {
 				sr.Time = m.Time
 				sr.Server = fmt.Sprintf("%s:%d", config.WebDomain, config.WebPort);
 				s, _ := json.Marshal(sr)
-				tp.Body = string(s)
+				tp.Body = s
 				tp.Length = uint32(len(tp.Body))
 				gateManager.PublishProtocol(tp)
 			} else {

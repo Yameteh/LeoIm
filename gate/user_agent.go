@@ -68,7 +68,7 @@ type UserAgent struct {
 func (ua *UserAgent) HandleProtocol(p *Protocol) {
 	if p.Type == PROTOCOL_TYPE_AUTH {
 		var req AuthRequest
-		err := json.Unmarshal([]byte(p.Body), &req)
+		err := json.Unmarshal(p.Body, &req)
 		if err != nil {
 			return
 		}

@@ -20,7 +20,7 @@ type Protocol struct {
 	Version uint8
 	Type    uint8
 	Length  uint32
-	Body    string
+	Body    []byte
 }
 
 type ProtocolCodec struct {
@@ -47,7 +47,7 @@ func (pc *ProtocolCodec) Decode() (*Protocol, error) {
 	if err := binary.Read(pc.Reader, binary.BigEndian, body); err != nil {
 		return protocol, err
 	}
-	protocol.Body = string(body)
+	protocol.Body = body
 	glog.Info("decode protocol ", protocol)
 	return protocol, nil
 }
@@ -62,7 +62,7 @@ func (pc *ProtocolCodec) Encode(p *Protocol) error {
 	if err := binary.Write(pc.Writer, binary.BigEndian, p.Length); err != nil {
 		return err
 	}
-	if err := binary.Write(pc.Writer, binary.BigEndian, []byte(p.Body)); err != nil {
+	if err := binary.Write(pc.Writer, binary.BigEndian, p.Body); err != nil {
 		return err
 	}
 	glog.Info("encode protocol ", p)
