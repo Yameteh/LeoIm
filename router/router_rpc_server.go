@@ -34,7 +34,7 @@ func (rrs *RouterRpcServer) HandleMessage(msg *Message, ret *int) error {
 			err := json.Unmarshal(msg.Body, m)
 			if err != nil {
 				glog.Error(err)
-				return;
+				return
 			}
 			if rrs.saveMessage(m) {
 				tp := new(ToProtocol)
@@ -59,6 +59,36 @@ func (rrs *RouterRpcServer) HandleMessage(msg *Message, ret *int) error {
 				glog.Info("router transfer message ", tp)
 				gateManager.PublishProtocol(tp)
 			}
+		case 80:
+			sdp := new(StreamSdp)
+			err := json.Unmarshal(msg.Body,sdp)
+			if err != nil {
+				glog.Error(err)
+				return
+			}
+
+			a := NewAudioStream("udp","172.25.1.53",10000)
+			a.Record()
+
+			b := NewVideoStream("udp","172.25.1.53",10003)
+			b.Record()
+
+			sdp.InAddr = "172.25.1.53";
+			sdp.AudioPort = 10000;
+			sdp.VideoPort = 10003;
+
+			tp := new(ToProtocol)
+			tp.Type = 81
+			tp.Version = 1
+			tp.To = msg.From
+			s , _ := json.Marshal(sdp)
+			tp.Body = s
+			tp.Length = uint32(len(tp.Body))
+			fmt.Println(tp.To)
+			gateManager.PublishProtocol(tp)
+
+
+
 
 		}
 	}(msg)

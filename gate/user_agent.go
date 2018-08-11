@@ -74,7 +74,7 @@ func (ua *UserAgent) HandleProtocol(p *Protocol) {
 		}
 		ua.Auth(req)
 	} else {
-		routerManager.PublishMessage(p)
+		routerManager.PublishMessage(ua.User.Uuid,p)
 	}
 }
 

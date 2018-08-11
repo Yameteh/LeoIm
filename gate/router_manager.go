@@ -25,7 +25,7 @@ func (rm *RouterManager) ChangeCurIndex() {
 
 }
 
-func (rm *RouterManager) PublishMessage(p *Protocol) {
+func (rm *RouterManager) PublishMessage(uuid string,p *Protocol) {
 	var client *rpc.Client
 	var err error
 	defer func() {
@@ -43,6 +43,7 @@ func (rm *RouterManager) PublishMessage(p *Protocol) {
 			message.Version = p.Version
 			message.Type = p.Type
 			message.Body = p.Body
+			message.From = uuid
 			var ret int
 			client.Call("RouterRpcServer.HandleMessage", message, &ret)
 			if ret != 0 {

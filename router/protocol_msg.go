@@ -15,3 +15,16 @@ type SyncResponse struct {
 	Time  int64
 }
 
+type StreamSdp struct {
+	InAddr string
+	AudioCodec string
+	AudioPort int
+	AudioSampleRate int
+	AudioBitrate int
+	VideoCodec string
+	VideoPort int
+	VideoWidth int
+	VideoHeight int
+	VideoFrameRate int
+	VideoBitrate int
+}

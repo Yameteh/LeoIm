@@ -3,6 +3,7 @@ package main
 
 type Message struct {
 	Version uint8
+	From    string
 	Type    uint8
 	Body    []byte
 }
