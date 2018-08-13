@@ -1,36 +1,31 @@
 package main
 
-import "fmt"
+import (
+	"github.com/wernerd/GoRTP/src/net/rtp"
+	"github.com/nareix/joy4/cgo/ffmpeg"
+)
 
 type VideoStream struct {
-	Net   string
-	Addr  string
-	Port  int
-	Codec *AudioCodec
-	conn  StreamConn
+	decoder *ffmpeg.VideoDecoder
+	Session *rtp.Session
 }
 
-func NewVideoStream(net string,addr string,port int) *VideoStream {
-	return &VideoStream{net, addr, port, nil,nil}
+func NewVideoStream(s *rtp.Session) *VideoStream {
+	return &VideoStream{Session:s}
 
 }
 
-func (as *VideoStream) Record() {
+func (vs *VideoStream) initDecoder() {
+
+}
+
+func (vs *VideoStream) Record() {
 	go func() {
-		if as.Net == "tcp" {
-			c := new(StreamUdpConn)
-			c.Create(as.Addr,as.Port)
-			as.conn = c
-		}else if as.Net == "udp" {
-			c := new(StreamUdpConn)
-			c.Create(as.Addr,as.Port)
-			as.conn = c
-		}
+		rc := vs.Session.CreateDataReceiveChan()
 
-		out := make([]byte,1024)
-		for {
-			as.conn.Read(out)
-			fmt.Println(string(out))
+		for p := range rc {
+			p.Print("video")
 		}
-	}();
+	}()
+	vs.Session.StartSession()
 }

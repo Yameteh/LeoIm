@@ -6,12 +6,15 @@ import (
 	_ "github.com/lib/pq"
 
 	"fmt"
+	"github.com/wernerd/GoRTP/src/net/rtp"
+	"net"
 )
 
 type RouterRpcServer struct {
 }
 
 func NewRouterRpcServer() *RouterRpcServer {
+	rtp.PayloadFormatMap[96] = &rtp.PayloadFormat{96, rtp.Audio | rtp.Video, 90000, 0, "H264/MB"}
 	return &RouterRpcServer{}
 }
 
@@ -67,15 +70,20 @@ func (rrs *RouterRpcServer) HandleMessage(msg *Message, ret *int) error {
 				return
 			}
 
-			a := NewAudioStream("udp","172.25.1.53",10000)
-			a.Record()
 
-			b := NewVideoStream("udp","172.25.1.53",10003)
-			b.Record()
-
-			sdp.InAddr = "172.25.1.53";
+			sdp.InAddr = "172.25.1.137";
 			sdp.AudioPort = 10000;
-			sdp.VideoPort = 10003;
+			addr,err := net.ResolveIPAddr("ip",sdp.InAddr)
+			fmt.Println(err)
+			transportA,err := rtp.NewTransportUDP(addr,sdp.AudioPort,"")
+			fmt.Println(err)
+			as := NewAudioStream(rtp.NewSession(transportA,transportA))
+			as.Record();
+
+			sdp.VideoPort = 10004;
+			transportV,_ := rtp.NewTransportUDP(addr,sdp.VideoPort,"")
+			vs := NewVideoStream(rtp.NewSession(transportV,transportV))
+			vs.Record()
 
 			tp := new(ToProtocol)
 			tp.Type = 81

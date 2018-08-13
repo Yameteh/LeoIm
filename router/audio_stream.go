@@ -1,43 +1,30 @@
 package main
 
-import "fmt"
+import (
+	"github.com/wernerd/GoRTP/src/net/rtp"
+	"github.com/nareix/joy4/cgo/ffmpeg"
+)
 
 type AudioStream struct {
-	Net   string
-	Addr  string
-	Port  int
-	Codec *AudioCodec
-	conn  StreamConn
+	decoder *ffmpeg.AudioDecoder
+	Session *rtp.Session
 }
 
-func NewAudioStream(net string, addr string, port int) *AudioStream {
-	return &AudioStream{net, addr, port, nil, nil}
+func NewAudioStream(s *rtp.Session) *AudioStream {
+	return &AudioStream{Session:s}
 }
+
+func(as *AudioStream) initDecoder(){
+}
+
 
 func (as *AudioStream) Record() {
 	go func() {
-		var err error
-		if as.Net == "tcp" {
-			c := new(StreamUdpConn)
-			err = c.Create(as.Addr, as.Port)
-			as.conn = c
-		} else if as.Net == "udp" {
-			c := new(StreamUdpConn)
-			err = c.Create(as.Addr, as.Port)
-			as.conn = c
+		rc := as.Session.CreateDataReceiveChan()
+		for p := range rc {
+			p.Print("audio")
 		}
-
-		if err != nil {
-			fmt.Println(err)
-		} else {
-			out := make([]byte, 1024)
-			for {
-
-				as.conn.Read(out)
-				fmt.Println(string(out))
-			}
-		}
-
-	}();
+	}()
+	as.Session.StartSession()
 }
 
