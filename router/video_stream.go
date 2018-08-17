@@ -2,29 +2,26 @@ package main
 
 import (
 	"github.com/wernerd/GoRTP/src/net/rtp"
-	"github.com/nareix/joy4/cgo/ffmpeg"
 )
 
 type VideoStream struct {
-	decoder *ffmpeg.VideoDecoder
+	H264p PayloadProcessor
 	Session *rtp.Session
 }
 
 func NewVideoStream(s *rtp.Session) *VideoStream {
-	return &VideoStream{Session:s}
+	return &VideoStream{H264p:NewH264Processor(),Session:s}
 
 }
 
-func (vs *VideoStream) initDecoder() {
-
-}
 
 func (vs *VideoStream) Record() {
 	go func() {
 		rc := vs.Session.CreateDataReceiveChan()
 
 		for p := range rc {
-			p.Print("video")
+			//p.Print("video")
+			vs.H264p.Process(p)
 		}
 	}()
 	vs.Session.StartSession()
