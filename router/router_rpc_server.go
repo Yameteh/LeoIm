@@ -71,7 +71,7 @@ func (rrs *RouterRpcServer) HandleMessage(msg *Message, ret *int) error {
 			}
 
 
-			sdp.InAddr = "172.25.1.137";
+			sdp.InAddr = config.WebDomain;
 			sdp.AudioPort = 10000;
 			addr,err := net.ResolveIPAddr("ip",sdp.InAddr)
 			fmt.Println(err)

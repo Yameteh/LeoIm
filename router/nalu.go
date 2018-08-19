@@ -5,7 +5,6 @@ import (
 	"github.com/wernerd/GoRTP/src/net/rtp"
 )
 
-// Base NALU
 type NALU struct {
 	forbidden bool   // forbidden_zero_bit
 	nri       int8   // nal_ref_idc
@@ -15,22 +14,19 @@ type NALU struct {
 	payload   []byte // entire payload from RTP packet
 }
 
-// Bitmasks for base NALU
 const (
-	headIdx  = 0
-	fMask    = 0x80
-	nriMask  = 0x60
+	headIdx = 0
+	fMask = 0x80
+	nriMask = 0x60
 	typeMask = 0x1f
 )
 
-// Cosntruct NALU from an RTP packet
 func FromRTP(rtp *rtp.DataPacket) *NALU {
 	return FromBytes(rtp.Payload(), rtp.Sequence(), rtp.Timestamp())
 }
 
-// Cosntruct NALU from a byte array and RTP seq and TS vals
 func FromBytes(payload []byte, seq uint16, ts uint32) *NALU {
-  return &NALU{ payload: payload, seq: seq, ts: ts}
+	return &NALU{payload: payload, seq: seq, ts: ts}
 }
 
 func (n *NALU) Payload() []byte {
@@ -57,47 +53,43 @@ func (n *NALU) TS() uint32 {
 	return n.ts
 }
 
-// Pretty print a NALU
 func (n *NALU) String() string {
 	return fmt.Sprintf("Forbidden: %v, NRI: %b, Type: %v, Seq: %v, TS: %v, Len: %v", n.Forbidden(), n.NRI(), n.NUT(), n.Seq(), n.TS(), len(n.Payload()))
 }
 
-// Single NALU == Base NALU
 type SingleUnit struct {
 	*NALU
 }
 
-// FU-A NALU
 type FUAUnit struct {
 	*NALU
 }
 
-// Bitmasks for FU-A NALUs
 const (
-	fuaHIdx       = 1
-  fuaHStartMask = 0x80
-	fuaHEndMask   = 0x40
-  fuaHResMask = 0x20
-	fuaHNUTMask   = 0x1f
-  fuaPayIdx = 2
+	fuaHIdx = 1
+	fuaHStartMask = 0x80
+	fuaHEndMask = 0x40
+	fuaHResMask = 0x20
+	fuaHNUTMask = 0x1f
+	fuaPayIdx = 2
 )
 
 func (n *NALU) Start() bool {
-  return n.Payload()[fuaHIdx] & fuaHStartMask >> 7 != 0
+	return n.Payload()[fuaHIdx] & fuaHStartMask >> 7 != 0
 }
 
 func (n *NALU) End() bool {
-  return n.Payload()[fuaHIdx] & fuaHEndMask >> 6 != 0
+	return n.Payload()[fuaHIdx] & fuaHEndMask >> 6 != 0
 }
 
 func (n *NALU) Reserved() bool {
-  return n.Payload()[fuaHIdx] & fuaHResMask >> 5 != 0
+	return n.Payload()[fuaHIdx] & fuaHResMask >> 5 != 0
 }
 
 func (n *NALU) PayNUT() int8 {
-  return int8(n.Payload()[fuaHIdx] & fuaHNUTMask)
+	return int8(n.Payload()[fuaHIdx] & fuaHNUTMask)
 }
 
 func (n *NALU) FPayload() []byte {
-  return n.Payload()[2:]
+	return n.Payload()[2:]
 }
