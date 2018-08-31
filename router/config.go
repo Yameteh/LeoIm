@@ -4,6 +4,7 @@ import (
 	"github.com/golang/glog"
 	"gopkg.in/ini.v1"
 	"strings"
+	"github.com/wernerd/GoRTP/src/net/rtp"
 )
 
 const (
@@ -20,6 +21,7 @@ const (
 	INI_KEY_PASSWORD = "password"
 
 	INI_SECTION_WEB = "web"
+	INI_KEY_FILE_ROOT_DIR = "file_root_dir"
 
 	INI_SECTION_REDIS = "redis_server"
 
@@ -37,6 +39,7 @@ type Config struct {
 	WebPort    int
 	RedisDomain string
 	RedisPort  int
+	FileRootDir string
 	file       *ini.File
 }
 
@@ -113,6 +116,12 @@ func (cfg *Config) Parse() {
 		if p, err := s.GetKey(INI_KEY_PORT); err == nil {
 			cfg.WebPort, _ = p.Int()
 		} else {
+			glog.Error(err)
+		}
+
+		if wrd,err := s.GetKey(INI_KEY_FILE_ROOT_DIR);err == nil {
+			cfg.FileRootDir = wrd.String()
+		}else {
 			glog.Error(err)
 		}
 	}
