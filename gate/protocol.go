@@ -6,6 +6,7 @@ import (
 	"net"
 
 	"github.com/golang/glog"
+	"fmt"
 )
 
 const (
@@ -22,6 +23,11 @@ type Protocol struct {
 	Type    uint8
 	Length  uint32
 	Body    []byte
+}
+
+func (s *Protocol) String() string{
+	return fmt.Sprintf("Version %d,Type %d,Length %d,body %s",s.Version,s.Type,s.Length,
+			string(s.Body))
 }
 
 type ProtocolCodec struct {

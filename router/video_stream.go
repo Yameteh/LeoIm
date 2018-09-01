@@ -9,6 +9,7 @@ import (
 	"os"
 	"github.com/nareix/joy4/av"
 	"time"
+
 )
 
 type VideoStream struct {
@@ -18,6 +19,8 @@ type VideoStream struct {
 	sps     []byte
 	pps     []byte
 	muxing  bool
+	end     bool
+	baseT   time.Duration
 }
 
 func NewVideoStream(s *rtp.Session) *VideoStream {
@@ -32,53 +35,53 @@ func (vs *VideoStream)NALReceived(n SingleUnit) {
 	switch n.NUT() {
 	case 7:
 		fmt.Println("sps received")
-		vs.sps = n.Payload()[1:]
+		vs.sps = n.Payload()
 		vs.checkSPSandPPS()
 	case 8:
 		fmt.Println("pps received")
-		vs.pps = n.Payload()[1:]
+		vs.pps = n.Payload()
 		vs.checkSPSandPPS()
 	case 5:
-		if vs.muxing {
+		if vs.muxing && !vs.end{
 			p := av.Packet{}
 			p.IsKeyFrame = true
-			p.Data = n.Payload()[1:]
+			p.Data = n.Payload()
 			p.Idx = 0
-			p.Time =  time.Duration(time.Now().Unix())
-			p.CompositionTime =  time.Duration(5*1000)
+			p.Time = vs.baseT
+			p.CompositionTime = p.Time
 			err := vs.Muxer.WritePacket(p)
 			if err != nil {
 				glog.Error(err)
 			}
-			err = vs.Muxer.WriteTrailer()
-			if err != nil {
-				glog.Error(err)
-			}
+			vs.baseT = vs.baseT + 40*time.Millisecond
 
 		}
 
 	case 1:
-		if vs.muxing {
+		if vs.muxing && !vs.end{
 			p := av.Packet{}
 			p.IsKeyFrame = false
-			p.Data = n.Payload()[1:]
+			p.Data = n.Payload()
 			p.Idx = 0
-			p.Time =  time.Duration(time.Now().Unix())
-			p.CompositionTime = time.Duration(5*1000)
-
+			p.Time = vs.baseT
+			p.CompositionTime = p.Time
 			err := vs.Muxer.WritePacket(p)
 			if err != nil {
 				glog.Error(err)
 			}
-
-			err = vs.Muxer.WriteTrailer()
-			if err != nil {
-				glog.Error(err)
-			}
+			vs.baseT = vs.baseT + 40*time.Millisecond
 		}
 
 	}
 
+}
+
+func (vs *VideoStream) End() {
+	vs.end = true
+	err := vs.Muxer.WriteTrailer()
+	if err != nil {
+		glog.Error(err)
+	}
 }
 
 func (vs *VideoStream) checkSPSandPPS() {

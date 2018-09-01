@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/wernerd/GoRTP/src/net/rtp"
 	"net"
+	"time"
 )
 
 type RouterRpcServer struct {
@@ -84,7 +85,10 @@ func (rrs *RouterRpcServer) HandleMessage(msg *Message, ret *int) error {
 			transportV,_ := rtp.NewTransportUDP(addr,sdp.VideoPort,"")
 			vs := NewVideoStream(rtp.NewSession(transportV,transportV))
 			vs.Record()
-
+			time.AfterFunc(1*time.Minute, func() {
+				fmt.Println("------------------ end")
+				vs.End()
+			})
 			tp := new(ToProtocol)
 			tp.Type = 81
 			tp.Version = 1
