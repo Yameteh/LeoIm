@@ -28,3 +28,8 @@ type StreamSdp struct {
 	VideoFrameRate int
 	VideoBitrate int
 }
+
+type UploadResponse struct {
+	FileUrl string
+	Code  int
+}
