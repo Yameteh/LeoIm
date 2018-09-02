@@ -67,7 +67,7 @@ func GetRandomString(length int64) string {
 
 func main() {
 	fmt.Println("gate test start")
-	conn, err := net.Dial("tcp", "172.25.1.137:8979")
+	conn, err := net.Dial("tcp", "172.25.1.53:8979")
 	if err != nil {
 		fmt.Println("dial error : ", err)
 		return
@@ -199,7 +199,7 @@ func Msg(uuid string,content string) {
 	message.From = account
 	message.To = uuid
 	message.MimeType = "text/plain"
-	message.Time = time.Now().Unix()
+	message.Time = time.Now().UnixNano()/1e6
 	fmt.Println("send time ",message.Time)
 	message.Content = content
 	p := CreateProtocolMsg(1,PROTOCOL_TYPE_MSG,message)
