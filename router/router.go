@@ -44,8 +44,8 @@ func main() {
 }
 
 func setupWebServer() {
-	webServer := NewRouterWebServer()
-	webServer.Serve()
+	syncServer := NewRouterSyncServer()
+	syncServer.Serve()
 }
 
 func setupRouterRpcServer() {

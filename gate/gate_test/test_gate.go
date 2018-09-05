@@ -15,6 +15,8 @@ import (
 	"net/http"
 	"strconv"
 	"io/ioutil"
+	"mime/multipart"
+	"io"
 )
 
 type AuthRequest struct {
@@ -65,9 +67,11 @@ func GetRandomString(length int64) string {
 	return string(result)
 }
 
+const CONNECT_SERVER = "172.25.1.137:8979"
+
 func main() {
 	fmt.Println("gate test start")
-	conn, err := net.Dial("tcp", "172.25.1.53:8979")
+	conn, err := net.Dial("tcp", CONNECT_SERVER)
 	if err != nil {
 		fmt.Println("dial error : ", err)
 		return
@@ -112,11 +116,51 @@ func main() {
 					}else {
 						fmt.Println("ps : msg xx xxx")
 					}
+				case "file":
+					if len(cmds) == 3 {
+						msgFile(cmds[1],cmds[2])
+					}else {
+						fmt.Println("ps : file xx xxx")
+					}
 				}
 
 			}
 		}
 	}
+}
+
+func msgFile(to string,file string) {
+	bodyBuf := &bytes.Buffer{}
+	bodyWriter := multipart.NewWriter(bodyBuf)
+
+	fileWriter,err := bodyWriter.CreateFormFile("file",file)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	f,err := os.Open(file)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	_,err = io.Copy(fileWriter,f)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	bodyWriter.WriteField("user",to)
+	contentType := bodyWriter.FormDataContentType()
+	bodyWriter.Close()
+	r,err := http.NewRequest("POST","http://localhost:9922/file",bodyBuf)
+	r.Header.Add("Authorization","Basic "+GetBase64(account+":"+token))
+	r.Header.Add("Content-Type",contentType)
+	_ , err = http.DefaultClient.Do(r)
+	if err != nil {
+		fmt.Println(err)
+	}
+
 }
 
 func sync(p *Protocol) {

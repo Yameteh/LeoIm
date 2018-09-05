@@ -4,7 +4,6 @@ import (
 	"github.com/golang/glog"
 	"gopkg.in/ini.v1"
 	"strings"
-	"github.com/wernerd/GoRTP/src/net/rtp"
 )
 
 const (
@@ -20,8 +19,7 @@ const (
 	INI_KEY_USER = "user"
 	INI_KEY_PASSWORD = "password"
 
-	INI_SECTION_WEB = "web"
-	INI_KEY_FILE_ROOT_DIR = "file_root_dir"
+	INI_SECTION_SYNC_SERVER = "sync_server"
 
 	INI_SECTION_REDIS = "redis_server"
 
@@ -105,7 +103,7 @@ func (cfg *Config) Parse() {
 
 	}
 
-	s = cfg.file.Section(INI_SECTION_WEB)
+	s = cfg.file.Section(INI_SECTION_SYNC_SERVER)
 	if s != nil {
 		if d, err := s.GetKey(INI_KEY_DOMAIN); err == nil {
 			cfg.WebDomain = d.String()
@@ -119,11 +117,6 @@ func (cfg *Config) Parse() {
 			glog.Error(err)
 		}
 
-		if wrd,err := s.GetKey(INI_KEY_FILE_ROOT_DIR);err == nil {
-			cfg.FileRootDir = wrd.String()
-		}else {
-			glog.Error(err)
-		}
 	}
 
 	s = cfg.file.Section(INI_SECTION_REDIS)

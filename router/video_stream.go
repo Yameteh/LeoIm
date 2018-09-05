@@ -53,7 +53,7 @@ func (vs *VideoStream)NALReceived(n SingleUnit) {
 			if err != nil {
 				glog.Error(err)
 			}
-			vs.baseT = vs.baseT + 40*time.Millisecond
+			vs.baseT = vs.baseT + 25*time.Millisecond
 
 		}
 
@@ -69,7 +69,7 @@ func (vs *VideoStream)NALReceived(n SingleUnit) {
 			if err != nil {
 				glog.Error(err)
 			}
-			vs.baseT = vs.baseT + 40*time.Millisecond
+			vs.baseT = vs.baseT + 25*time.Millisecond
 		}
 
 	}
