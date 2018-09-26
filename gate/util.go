@@ -2,13 +2,13 @@ package main
 
 import (
 	"crypto/md5"
-	"encoding/json"
-	"encoding/hex"
 	"encoding/base64"
+	"encoding/hex"
+	"encoding/json"
 )
 
 func GetMd5(in string) string {
- 	h := md5.New()
+	h := md5.New()
 	h.Write([]byte(in))
 	return hex.EncodeToString(h.Sum(nil))
 }

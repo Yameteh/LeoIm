@@ -8,37 +8,36 @@ import (
 
 const (
 	INI_SECTION_LISTEN = "listen"
-	INI_KEY_DOMAIN = "domain"
-	INI_KEY_PORT = "port"
+	INI_KEY_DOMAIN     = "domain"
+	INI_KEY_PORT       = "port"
 
 	INI_SECTION_GATE = "gate_rpc_server"
-	INI_KEY_DOMAINS = "domains"
+	INI_KEY_DOMAINS  = "domains"
 
 	INI_SECTION_POSTGRES = "postgres"
-	INI_KEY_DB = "database"
-	INI_KEY_USER = "user"
-	INI_KEY_PASSWORD = "password"
+	INI_KEY_DB           = "database"
+	INI_KEY_USER         = "user"
+	INI_KEY_PASSWORD     = "password"
 
 	INI_SECTION_SYNC_SERVER = "sync_server"
 
 	INI_SECTION_REDIS = "redis_server"
-
 )
 
 type Config struct {
-	Domain     string
-	Port       int
-	GateServer []string
-	PqDomain   string
-	PqDb       string
-	PqUser     string
-	PqPwd      string
-	WebDomain  string
-	WebPort    int
+	Domain      string
+	Port        int
+	GateServer  []string
+	PqDomain    string
+	PqDb        string
+	PqUser      string
+	PqPwd       string
+	WebDomain   string
+	WebPort     int
 	RedisDomain string
-	RedisPort  int
+	RedisPort   int
 	FileRootDir string
-	file       *ini.File
+	file        *ini.File
 }
 
 func NewConfig(file string) *Config {

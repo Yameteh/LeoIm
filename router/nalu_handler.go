@@ -26,7 +26,7 @@ func (f *FUAHandler) Handle(nalu *NALU, output chan SingleUnit) error {
 		return nil
 	}
 
-	if len(f.buffer) > 0 && !fua.Start() && nalu.Seq() - f.buffer[len(f.buffer) - 1].Seq() == 1 {
+	if len(f.buffer) > 0 && !fua.Start() && nalu.Seq()-f.buffer[len(f.buffer)-1].Seq() == 1 {
 		f.buffer = append(f.buffer, fua)
 
 		if fua.End() {

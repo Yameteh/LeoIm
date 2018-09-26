@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/labstack/echo"
-	"github.com/golang/glog"
-	"fmt"
 	"flag"
+	"fmt"
+	"github.com/golang/glog"
+	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
 
@@ -13,7 +13,6 @@ const (
 )
 
 var config *Config
-
 
 func main() {
 	flag.Parse()
@@ -29,11 +28,10 @@ func main() {
 
 	e := echo.New()
 	e.Use(middleware.BasicAuth(basicAuthHandle))
-	e.Static("file",config.RootDirectory)
-	AddRouter(e,&FileRouter{})
-	e.Start(fmt.Sprintf("%s:%d",config.Domain,config.Port))
+	e.Static("file", config.RootDirectory)
+	AddRouter(e, &FileRouter{})
+	e.Start(fmt.Sprintf("%s:%d", config.Domain, config.Port))
 }
-
 
 func basicAuthHandle(u, p string, c echo.Context) (bool, error) {
 	user := RedisQueryUser(u)

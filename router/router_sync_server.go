@@ -1,17 +1,16 @@
 package main
 
 import (
-	"net/http"
+	"encoding/json"
 	"fmt"
 	"github.com/golang/glog"
+	"net/http"
 	"strconv"
-	"encoding/json"
 )
 
 const HEADER_SYNC_TIME = "SyncTime"
 
 type RouterSyncServer struct {
-
 }
 
 func NewRouterSyncServer() *RouterSyncServer {
@@ -35,9 +34,9 @@ func (rws *RouterSyncServer) Serve() {
 func (rws *RouterSyncServer) passAuth(u string, p string) bool {
 	user := RedisQueryUser(u)
 	if user != nil && user.Uuid == u && user.Token == p {
-		return true;
+		return true
 	} else {
-		return false;
+		return false
 	}
 }
 
@@ -64,7 +63,3 @@ func (rws *RouterSyncServer) sync(w http.ResponseWriter, u string, time string) 
 		glog.Error(err)
 	}
 }
-
-
-
-

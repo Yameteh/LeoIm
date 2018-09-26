@@ -1,7 +1,5 @@
 package main
 
-
-
 const (
 	AUTHACL_CODE_OK     = 200
 	AUTHACL_CODE_ERROR  = 402
@@ -17,9 +15,5 @@ type AuthResponse struct {
 	Code   int
 	Nonce  string
 	Method string
-	Token string
+	Token  string
 }
-
-
-
-

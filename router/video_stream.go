@@ -1,15 +1,14 @@
 package main
 
 import (
-	"github.com/wernerd/GoRTP/src/net/rtp"
 	"fmt"
-	"github.com/nareix/joy4/format/mp4"
-	"github.com/nareix/joy4/codec/h264parser"
 	"github.com/golang/glog"
-	"os"
 	"github.com/nareix/joy4/av"
+	"github.com/nareix/joy4/codec/h264parser"
+	"github.com/nareix/joy4/format/mp4"
+	"github.com/wernerd/GoRTP/src/net/rtp"
+	"os"
 	"time"
-
 )
 
 type VideoStream struct {
@@ -31,7 +30,7 @@ func NewVideoStream(s *rtp.Session) *VideoStream {
 	return vs
 }
 
-func (vs *VideoStream)NALReceived(n SingleUnit) {
+func (vs *VideoStream) NALReceived(n SingleUnit) {
 	switch n.NUT() {
 	case 7:
 		fmt.Println("sps received")
@@ -42,8 +41,9 @@ func (vs *VideoStream)NALReceived(n SingleUnit) {
 		vs.pps = n.Payload()
 		vs.checkSPSandPPS()
 	case 5:
-		if vs.muxing && !vs.end{
+		if vs.muxing && !vs.end {
 			p := av.Packet{}
+
 			p.IsKeyFrame = true
 			p.Data = n.Payload()
 			p.Idx = 0
@@ -54,11 +54,10 @@ func (vs *VideoStream)NALReceived(n SingleUnit) {
 				glog.Error(err)
 			}
 			vs.baseT = vs.baseT + 25*time.Millisecond
-
 		}
 
 	case 1:
-		if vs.muxing && !vs.end{
+		if vs.muxing && !vs.end {
 			p := av.Packet{}
 			p.IsKeyFrame = false
 			p.Data = n.Payload()
@@ -86,7 +85,7 @@ func (vs *VideoStream) End() {
 
 func (vs *VideoStream) checkSPSandPPS() {
 	if vs.pps != nil && vs.sps != nil && !vs.muxing {
-		fmt.Println("record mp4 ",vs.sps,",",vs.pps)
+		fmt.Println("record mp4 ", vs.sps, ",", vs.pps)
 		codecData, err := h264parser.NewCodecDataFromSPSAndPPS(vs.sps, vs.pps)
 		if err != nil {
 			glog.Error(err)

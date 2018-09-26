@@ -1,21 +1,20 @@
 package main
 
 import (
-	"strings"
-
 	"github.com/golang/glog"
 	"gopkg.in/ini.v1"
+	"strings"
 )
 
 const (
-	INI_SECTION_LISTEN = "listen"
-	INI_KEY_DOMAIN = "domain"
-	INI_KEY_PORT = "port"
+	INI_SECTION_LISTEN  = "listen"
+	INI_KEY_DOMAIN      = "domain"
+	INI_KEY_PORT        = "port"
 	INI_KEY_AUTH_METHOD = "auth_method"
-	INI_KEY_RPC_PORT = "rpc_port"
-	INI_SECTION_REDIS = "redis_server"
-	INI_SECTION_ROUTER = "router_server"
-	INI_KEY_ADDRESS = "domains"
+	INI_KEY_RPC_PORT    = "rpc_port"
+	INI_SECTION_REDIS   = "redis_server"
+	INI_SECTION_ROUTER  = "router_server"
+	INI_KEY_ADDRESS     = "domains"
 )
 
 type Config struct {

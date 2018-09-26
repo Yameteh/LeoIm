@@ -1,26 +1,26 @@
 package main
 
 import (
-	"gopkg.in/ini.v1"
 	"github.com/golang/glog"
+	"gopkg.in/ini.v1"
 )
 
 const (
-	INI_SECTION_LISTEN = "listen"
-	INI_KEY_DOMAIN = "domain"
-	INI_KEY_PORT = "port"
+	INI_SECTION_LISTEN     = "listen"
+	INI_KEY_DOMAIN         = "domain"
+	INI_KEY_PORT           = "port"
 	INI_KEY_ROOT_DIRECTORY = "root_directory"
 
 	INI_SECTION_REDIS = "redis_server"
 )
 
 type Config struct {
-	Domain     string
-	Port       int
-	RedisDomain string
-	RedisPort  int
+	Domain        string
+	Port          int
+	RedisDomain   string
+	RedisPort     int
 	RootDirectory string
-	file       *ini.File
+	file          *ini.File
 }
 
 func NewConfig(file string) *Config {
@@ -47,9 +47,9 @@ func (cfg *Config) Parse() {
 			glog.Error(err)
 		}
 
-		if rd,err := s.GetKey(INI_KEY_ROOT_DIRECTORY);err == nil {
+		if rd, err := s.GetKey(INI_KEY_ROOT_DIRECTORY); err == nil {
 			cfg.RootDirectory = rd.String()
-		}else {
+		} else {
 			glog.Error(err)
 		}
 	}
@@ -71,4 +71,3 @@ func (cfg *Config) Parse() {
 	}
 
 }
-

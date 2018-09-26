@@ -2,10 +2,10 @@ package main
 
 import (
 	"encoding/json"
-	"net"
-	"sync"
 	"github.com/golang/glog"
 	"github.com/satori/go.uuid"
+	"net"
+	"sync"
 	"time"
 )
 
@@ -74,7 +74,7 @@ func (ua *UserAgent) HandleProtocol(p *Protocol) {
 		}
 		ua.Auth(req)
 	} else {
-		routerManager.PublishMessage(ua.User.Uuid,p)
+		routerManager.PublishMessage(ua.User.Uuid, p)
 	}
 }
 

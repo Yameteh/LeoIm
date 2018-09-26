@@ -1,9 +1,9 @@
 package main
 
 import (
-	_ "github.com/lib/pq"
-	"github.com/go-xorm/xorm"
 	"fmt"
+	"github.com/go-xorm/xorm"
+	_ "github.com/lib/pq"
 	"github.com/pkg/errors"
 )
 
@@ -13,7 +13,7 @@ type StoreManager struct {
 }
 
 func NewStoreManager() *StoreManager {
-	return &StoreManager{connected:false}
+	return &StoreManager{connected: false}
 }
 
 func (sm *StoreManager) Init() error {
@@ -53,18 +53,15 @@ func (sm *StoreManager) Insert(data interface{}) error {
 	}
 }
 
-func (sm *StoreManager) QueryMessage(user string,time int64, out *[]MessageBody) error{
+func (sm *StoreManager) QueryMessage(user string, time int64, out *[]MessageBody) error {
 	if sm.Engine != nil {
 		if sm.connected {
-			err := sm.Engine.Where("message_body.to=? AND message_body.time>=?",user,time).Find(out)
+			err := sm.Engine.Where("message_body.to=? AND message_body.time>=?", user, time).Find(out)
 			return err
-		}else {
+		} else {
 			return errors.New("xorm query message when not connect database")
 		}
-	}else {
+	} else {
 		return errors.New("xorm query message when engine is nil")
 	}
 }
-
-
-

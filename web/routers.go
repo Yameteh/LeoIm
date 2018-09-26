@@ -1,18 +1,18 @@
 package main
 
 import (
-	"github.com/labstack/echo"
-	"os"
-	"io"
 	"fmt"
-	"time"
-	"net/http"
 	"github.com/golang/glog"
+	"github.com/labstack/echo"
+	"io"
+	"net/http"
+	"os"
 	"path/filepath"
+	"time"
 )
 
-func AddRouter(e *echo.Echo,r Router) {
-	e.Match(r.Methods(),r.Path(),r.Handler)
+func AddRouter(e *echo.Echo, r Router) {
+	e.Match(r.Methods(), r.Path(), r.Handler)
 }
 
 type Router interface {
@@ -21,9 +21,7 @@ type Router interface {
 	Handler(c echo.Context) error
 }
 
-
 type FileRouter struct {
-
 }
 
 func (fr *FileRouter) Methods() []string {
@@ -34,7 +32,7 @@ func (fr *FileRouter) Path() string {
 	return "/file"
 }
 
-func (fr *FileRouter) Handler(c echo.Context) error{
+func (fr *FileRouter) Handler(c echo.Context) error {
 	fmt.Println("handle upload file")
 	user := c.FormValue("user")
 
@@ -50,10 +48,10 @@ func (fr *FileRouter) Handler(c echo.Context) error{
 	}
 	defer src.Close()
 
-	fn := fmt.Sprintf("%s/%s/%d_%s",config.RootDirectory,user,time.Now().Unix(),filepath.Base(file.Filename))
-	fmt.Println("upload file ",fn)
+	fn := fmt.Sprintf("%s/%s/%d_%s", config.RootDirectory, user, time.Now().Unix(), filepath.Base(file.Filename))
+	fmt.Println("upload file ", fn)
 	dir := filepath.Dir(fn)
-	if exist,_ := PathExists(dir);!exist {
+	if exist, _ := PathExists(dir); !exist {
 		os.MkdirAll(dir, os.ModePerm)
 	}
 
@@ -68,16 +66,16 @@ func (fr *FileRouter) Handler(c echo.Context) error{
 		glog.Error(err)
 		return err
 	}
-	return c.String(http.StatusOK,"success")
+	return c.String(http.StatusOK, "success")
 }
 
 func PathExists(path string) (bool, error) {
-    _, err := os.Stat(path)
-    if err == nil {
-        return true, nil
-    }
-    if os.IsNotExist(err) {
-        return false, nil
-    }
-    return false, err
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return false, err
 }

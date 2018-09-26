@@ -15,9 +15,9 @@ type NALU struct {
 }
 
 const (
-	headIdx = 0
-	fMask = 0x80
-	nriMask = 0x60
+	headIdx  = 0
+	fMask    = 0x80
+	nriMask  = 0x60
 	typeMask = 0x1f
 )
 
@@ -34,7 +34,7 @@ func (n *NALU) Payload() []byte {
 }
 
 func (n *NALU) Forbidden() bool {
-	return n.Payload()[headIdx] & fMask >> 7 != 0
+	return n.Payload()[headIdx]&fMask>>7 != 0
 }
 
 func (n *NALU) NRI() int8 {
@@ -66,24 +66,24 @@ type FUAUnit struct {
 }
 
 const (
-	fuaHIdx = 1
+	fuaHIdx       = 1
 	fuaHStartMask = 0x80
-	fuaHEndMask = 0x40
-	fuaHResMask = 0x20
-	fuaHNUTMask = 0x1f
-	fuaPayIdx = 2
+	fuaHEndMask   = 0x40
+	fuaHResMask   = 0x20
+	fuaHNUTMask   = 0x1f
+	fuaPayIdx     = 2
 )
 
 func (n *NALU) Start() bool {
-	return n.Payload()[fuaHIdx] & fuaHStartMask >> 7 != 0
+	return n.Payload()[fuaHIdx]&fuaHStartMask>>7 != 0
 }
 
 func (n *NALU) End() bool {
-	return n.Payload()[fuaHIdx] & fuaHEndMask >> 6 != 0
+	return n.Payload()[fuaHIdx]&fuaHEndMask>>6 != 0
 }
 
 func (n *NALU) Reserved() bool {
-	return n.Payload()[fuaHIdx] & fuaHResMask >> 5 != 0
+	return n.Payload()[fuaHIdx]&fuaHResMask>>5 != 0
 }
 
 func (n *NALU) PayNUT() int8 {

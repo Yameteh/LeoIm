@@ -1,11 +1,12 @@
 package main
 
 import (
-	"fmt"
-	"github.com/wernerd/GoRTP/src/net/rtp"
 	"bytes"
 	"encoding/binary"
+	"fmt"
+
 	"github.com/golang/glog"
+	"github.com/wernerd/GoRTP/src/net/rtp"
 )
 
 type PayloadProcessor interface {
@@ -26,7 +27,7 @@ func NewH264Processor(p PayloadReceived) PayloadProcessor {
 	writable := make(chan SingleUnit)
 	stop := make(chan bool)
 	fua := NewFUAHandler()
-	handler := &H264Processor{writable: writable, stop: stop, fua: fua, pr:p}
+	handler := &H264Processor{writable: writable, stop: stop, fua: fua, pr: p}
 	go handler.outputter(handler.writable, handler.stop)
 	return handler
 }
@@ -47,7 +48,7 @@ func (u *H264Processor) Process(p *rtp.DataPacket) error {
 	case n.NUT() == 24:
 		u.handleStapA(n)
 	default:
-		fmt.Println("Dropped one type ",n.NUT())
+		fmt.Println("Dropped one type ", n.NUT())
 	}
 	p.FreePacket()
 	return nil
@@ -58,22 +59,22 @@ func (u *H264Processor) handleStapA(n *NALU) {
 	r := bytes.NewReader(p[1:])
 	var naluLen uint16
 	var nalu []byte
-	fmt.Println("stapA ",n.String())
-	fmt.Println("stapA ",p)
+	fmt.Println("stapA ", n.String())
+	fmt.Println("stapA ", p)
 	for {
-		err := binary.Read(r,binary.BigEndian,&naluLen)
+		err := binary.Read(r, binary.BigEndian, &naluLen)
 		if err != nil {
 			glog.Error(err)
 			break
 		}
-		fmt.Println("nalu len ",naluLen)
-		nalu = make([]byte,naluLen)
-		err = binary.Read(r,binary.BigEndian,nalu)
+		fmt.Println("nalu len ", naluLen)
+		nalu = make([]byte, naluLen)
+		err = binary.Read(r, binary.BigEndian, nalu)
 		if err != nil {
 			glog.Error(err)
 			break
 		}
-		n := FromBytes(nalu,n.Seq(),n.TS())
+		n := FromBytes(nalu, n.Seq(), n.TS())
 		u.writable <- SingleUnit{n}
 	}
 

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"net/rpc"
 	"github.com/golang/glog"
+	"net/rpc"
 	"sync"
 )
 
@@ -14,18 +14,18 @@ type RouterManager struct {
 }
 
 func NewRouterManager(count int) *RouterManager {
-	return &RouterManager{RouterCount:count, curIndex:0,lastIndex: -1}
+	return &RouterManager{RouterCount: count, curIndex: 0, lastIndex: -1}
 }
 
 func (rm *RouterManager) ChangeCurIndex() {
-	rm.curIndex ++
+	rm.curIndex++
 	if rm.curIndex >= rm.RouterCount {
 		rm.curIndex = 0
 	}
 
 }
 
-func (rm *RouterManager) PublishMessage(uuid string,p *Protocol) {
+func (rm *RouterManager) PublishMessage(uuid string, p *Protocol) {
 	var client *rpc.Client
 	var err error
 	defer func() {
@@ -61,4 +61,3 @@ func (rm *RouterManager) PublishMessage(uuid string,p *Protocol) {
 
 	}
 }
-

@@ -3,11 +3,11 @@ package main
 import (
 	"flag"
 
-	"github.com/golang/glog"
-	"net/rpc"
 	"fmt"
+	"github.com/golang/glog"
 	"net"
 	"net/http"
+	"net/rpc"
 )
 
 /**
@@ -59,7 +59,7 @@ func setupGateRpcServer() {
 			glog.Error(err)
 		} else {
 			http.Serve(l, nil)
-			glog.Info("gate rpc server start with address ",addr)
+			glog.Info("gate rpc server start with address ", addr)
 		}
 	}()
 

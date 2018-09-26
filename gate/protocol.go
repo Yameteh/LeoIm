@@ -5,16 +5,16 @@ import (
 	"io"
 	"net"
 
-	"github.com/golang/glog"
 	"fmt"
+	"github.com/golang/glog"
 )
 
 const (
-	PROTOCOL_TYPE_AUTH = 0
-	PROTOCOL_TYPE_AUTHACK = 1
-	PROTOCOL_TYPE_MSG = 2
-	PROTOCOL_TYPE_MSGACK = 3
-	PROTOCOL_TYPE_MSGSYNC = 4
+	PROTOCOL_TYPE_AUTH          = 0
+	PROTOCOL_TYPE_AUTHACK       = 1
+	PROTOCOL_TYPE_MSG           = 2
+	PROTOCOL_TYPE_MSGACK        = 3
+	PROTOCOL_TYPE_MSGSYNC       = 4
 	PROTOCOL_TYPE_STREAM_RECORD = 80
 )
 
@@ -25,9 +25,9 @@ type Protocol struct {
 	Body    []byte
 }
 
-func (s *Protocol) String() string{
-	return fmt.Sprintf("Version %d,Type %d,Length %d,body %s",s.Version,s.Type,s.Length,
-			string(s.Body))
+func (s *Protocol) String() string {
+	return fmt.Sprintf("Version %d,Type %d,Length %d,body %s", s.Version, s.Type, s.Length,
+		string(s.Body))
 }
 
 type ProtocolCodec struct {

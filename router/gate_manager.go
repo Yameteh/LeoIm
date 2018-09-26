@@ -1,12 +1,11 @@
 package main
 
 import (
-	"net/rpc"
 	"github.com/golang/glog"
+	"net/rpc"
 )
 
 type GateManager struct {
-
 }
 
 func NewGateManager() *GateManager {
@@ -28,4 +27,3 @@ func (gm *GateManager) PublishProtocol(tp *ToProtocol) {
 		}
 	}
 }
-

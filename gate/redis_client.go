@@ -1,9 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"github.com/garyburd/redigo/redis"
 	"github.com/golang/glog"
-	"fmt"
 )
 
 type User struct {
@@ -46,4 +46,3 @@ func RedisQueryUser(uuid string) *User {
 		return nil
 	}
 }
-

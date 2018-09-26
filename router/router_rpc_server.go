@@ -2,13 +2,15 @@ package main
 
 import (
 	"encoding/json"
+
 	"github.com/golang/glog"
 	_ "github.com/lib/pq"
 
 	"fmt"
-	"github.com/wernerd/GoRTP/src/net/rtp"
 	"net"
 	"time"
+
+	"github.com/wernerd/GoRTP/src/net/rtp"
 )
 
 type RouterRpcServer struct {
@@ -34,7 +36,7 @@ func (rrs *RouterRpcServer) HandleMessage(msg *Message, ret *int) error {
 		switch msg.Type {
 		case 2:
 			m := new(MessageBody)
-			glog.Info("HandleMessage ",msg.Body)
+			glog.Info("HandleMessage ", msg.Body)
 			err := json.Unmarshal(msg.Body, m)
 			if err != nil {
 				glog.Error(err)
@@ -47,7 +49,7 @@ func (rrs *RouterRpcServer) HandleMessage(msg *Message, ret *int) error {
 				tp.Type = 4
 				sr := &SyncResponse{}
 				sr.Time = m.Time
-				sr.Server = fmt.Sprintf("%s:%d", config.WebDomain, config.WebPort);
+				sr.Server = fmt.Sprintf("%s:%d", config.WebDomain, config.WebPort)
 				s, _ := json.Marshal(sr)
 				tp.Body = s
 				tp.Length = uint32(len(tp.Body))
@@ -65,25 +67,25 @@ func (rrs *RouterRpcServer) HandleMessage(msg *Message, ret *int) error {
 			}
 		case 80:
 			sdp := new(StreamSdp)
-			err := json.Unmarshal(msg.Body,sdp)
+			err := json.Unmarshal(msg.Body, sdp)
 			if err != nil {
 				glog.Error(err)
 				return
 			}
 
-
-			sdp.InAddr = config.WebDomain;
-			sdp.AudioPort = 10000;
-			addr,err := net.ResolveIPAddr("ip",sdp.InAddr)
+			sdp.InAddr = config.WebDomain
+			sdp.AudioPort = 10000
+			addr, err := net.ResolveIPAddr("ip", sdp.InAddr)
 			fmt.Println(err)
-			transportA,err := rtp.NewTransportUDP(addr,sdp.AudioPort,"")
+			transportA, err := rtp.NewTransportUDP(addr, sdp.AudioPort, "")
 			fmt.Println(err)
-			as := NewAudioStream(rtp.NewSession(transportA,transportA))
-			as.Record();
+			as := NewAudioStream(rtp.NewSession(transportA, transportA))
+			as.Record()
 
-			sdp.VideoPort = 10004;
-			transportV,_ := rtp.NewTransportUDP(addr,sdp.VideoPort,"")
-			vs := NewVideoStream(rtp.NewSession(transportV,transportV))
+			sdp.VideoPort = 10004
+			transportV, _ := rtp.NewTransportUDP(addr, sdp.VideoPort, "")
+
+			vs := NewVideoStream(rtp.NewSession(transportV, transportV))
 			vs.Record()
 			time.AfterFunc(1*time.Minute, func() {
 				fmt.Println("------------------ end")
@@ -93,14 +95,11 @@ func (rrs *RouterRpcServer) HandleMessage(msg *Message, ret *int) error {
 			tp.Type = 81
 			tp.Version = 1
 			tp.To = msg.From
-			s , _ := json.Marshal(sdp)
+			s, _ := json.Marshal(sdp)
 			tp.Body = s
 			tp.Length = uint32(len(tp.Body))
 			fmt.Println(tp.To)
 			gateManager.PublishProtocol(tp)
-
-
-
 
 		}
 	}(msg)
