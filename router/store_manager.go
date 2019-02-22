@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
+
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-xorm/xorm"
-	_ "github.com/lib/pq"
 	"github.com/pkg/errors"
 )
 
@@ -17,10 +18,10 @@ func NewStoreManager() *StoreManager {
 }
 
 func (sm *StoreManager) Init() error {
-	connStr := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=disable", config.PqUser,
-		config.PqPwd, config.PqDomain, config.PqDb)
+	connStr := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?sslmode=disable", config.MysqlUser,
+		config.MysqlPwd, config.Domain, config.MysqlPort, config.MysqlDb)
 	var err error = nil
-	sm.Engine, err = xorm.NewEngine("postgres", connStr)
+	sm.Engine, err = xorm.NewEngine("mysql", connStr)
 
 	if err == nil {
 		err = sm.Engine.Ping()

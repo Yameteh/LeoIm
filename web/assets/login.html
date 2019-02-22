@@ -1,0 +1,45 @@
+{{define "login"}}
+<!doctype html>
+<html lang="cn">
+  <head>
+  <meta HTTP-EQUIV="pragma" CONTENT="no-cache"> 
+  <meta HTTP-EQUIV="Cache-Control" CONTENT="no-store, must-revalidate"> 
+  <meta HTTP-EQUIV="expires" CONTENT="0">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{{.}}</title>
+	 <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	 
+	 <style type="text/css">
+	 	body{
+	 	position:absolute;
+	 	left: 60%;
+	 	top: 30%;
+	 	}
+	 </style>
+  </head>
+  <body>
+    <form  class="form-sign" action="dologin" >
+  <div class="text-center mb-4">
+    <h1 class="h3 mb-3 font-weight-normal">{{.}}</h1>
+  </div>
+
+  <div class="form-label-group">
+    <input type="text" id="inputText" class="form-control" name="account" placeholder="账号" required autofocus>
+  </div>
+
+  <div class="form-label-group">
+    <input type="password" id="inputPassword" class="form-control" name="password" placeholder="密码" required>
+  </div>
+
+  <div class="checkbox mb-3">
+    <label>
+      <input type="checkbox" name="remember" value="yes">记住我</input>
+    </label>
+  </div>
+  <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+  <p class="mt-5 mb-3 text-muted text-center">&copy; 2017-2019</p>
+</form>
+</body>
+</html>
+{{end}}

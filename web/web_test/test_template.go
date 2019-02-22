@@ -22,12 +22,17 @@ func main() {
 	//		templates: template.Must(template.ParseGlob("*.html")),
 	//	}
 
-	e := echo.New()
-	//e.Renderer = t
-	e.Static("/", "assets")
-	e.GET("/hello", Hello)
-	e.GET("/dologin", Login)
-	e.Start(":8081")
+	go func() {
+		e := echo.New()
+		//e.Renderer = t
+		e.Static("/", "assets")
+		e.GET("/hello", Hello)
+		e.GET("/dologin", Login)
+		e.Start(":8081")
+	}()
+
+	b := echo.New()
+	b.Start(":8082")
 
 }
 
@@ -42,5 +47,6 @@ func Login(c echo.Context) error {
 	pwd := c.QueryParam("password")
 	rem := c.QueryParam("remember")
 	fmt.Printf("acc %s pwd %s rem %s", acc, pwd, rem)
+
 	return c.String(http.StatusOK, "login ")
 }

@@ -29,4 +29,5 @@ func CreateProtocolMsg(v uint8, t uint8, msg interface{}) *Protocol {
 	} else {
 		return nil
 	}
+
 }

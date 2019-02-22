@@ -4,20 +4,14 @@ import (
 	"encoding/json"
 
 	"github.com/golang/glog"
-	_ "github.com/lib/pq"
 
 	"fmt"
-	"net"
-	"time"
-
-	"github.com/wernerd/GoRTP/src/net/rtp"
 )
 
 type RouterRpcServer struct {
 }
 
 func NewRouterRpcServer() *RouterRpcServer {
-	rtp.PayloadFormatMap[96] = &rtp.PayloadFormat{96, rtp.Audio | rtp.Video, 90000, 0, "H264/MB"}
 	return &RouterRpcServer{}
 }
 
@@ -65,41 +59,6 @@ func (rrs *RouterRpcServer) HandleMessage(msg *Message, ret *int) error {
 				glog.Info("router transfer message ", tp)
 				gateManager.PublishProtocol(tp)
 			}
-		case 80:
-			sdp := new(StreamSdp)
-			err := json.Unmarshal(msg.Body, sdp)
-			if err != nil {
-				glog.Error(err)
-				return
-			}
-
-			sdp.InAddr = config.WebDomain
-			sdp.AudioPort = 10000
-			addr, err := net.ResolveIPAddr("ip", sdp.InAddr)
-			fmt.Println(err)
-			transportA, err := rtp.NewTransportUDP(addr, sdp.AudioPort, "")
-			fmt.Println(err)
-			as := NewAudioStream(rtp.NewSession(transportA, transportA))
-			as.Record()
-
-			sdp.VideoPort = 10004
-			transportV, _ := rtp.NewTransportUDP(addr, sdp.VideoPort, "")
-
-			vs := NewVideoStream(rtp.NewSession(transportV, transportV))
-			vs.Record()
-			time.AfterFunc(1*time.Minute, func() {
-				fmt.Println("------------------ end")
-				vs.End()
-			})
-			tp := new(ToProtocol)
-			tp.Type = 81
-			tp.Version = 1
-			tp.To = msg.From
-			s, _ := json.Marshal(sdp)
-			tp.Body = s
-			tp.Length = uint32(len(tp.Body))
-			fmt.Println(tp.To)
-			gateManager.PublishProtocol(tp)
 
 		}
 	}(msg)
