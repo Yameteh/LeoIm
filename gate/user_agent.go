@@ -2,11 +2,12 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/golang/glog"
-	"github.com/satori/go.uuid"
 	"net"
 	"sync"
 	"time"
+
+	"github.com/golang/glog"
+	"github.com/satori/go.uuid"
 )
 
 const (
@@ -29,6 +30,7 @@ func (am *AgentManager) NewUserAgent(conn net.Conn) *UserAgent {
 		Conn:   conn,
 		Codec:  NewProtocolCodec(conn),
 		Writer: make(chan *Protocol),
+		Closer: make(chan int),
 		Status: USER_STATUS_UNKOWN}
 	return ua
 }
@@ -60,6 +62,7 @@ type UserAgent struct {
 	Conn   net.Conn
 	Codec  *ProtocolCodec
 	Writer chan *Protocol
+	Closer chan int
 	Status uint
 	Nonce  string
 	User   *User
@@ -127,6 +130,7 @@ func (ua *UserAgent) Close() {
 	ua.Writer <- nil
 	ua.Conn.Close()
 	ua.Status = USER_STATUS_UNKOWN
+	ua.Closer <- 1
 	uaManager.delUserAgent(ua)
 }
 
@@ -135,6 +139,7 @@ func (ua *UserAgent) Run() {
 		for {
 			p, err := ua.Codec.Decode()
 			if err != nil {
+				glog.Error(err)
 				ua.Close()
 				return
 			} else {

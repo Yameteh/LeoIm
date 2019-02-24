@@ -2,10 +2,12 @@ package main
 
 import (
 	"encoding/binary"
+	"errors"
 	"io"
 	"net"
 
 	"fmt"
+
 	"github.com/golang/glog"
 )
 
@@ -16,6 +18,10 @@ const (
 	PROTOCOL_TYPE_MSGACK        = 3
 	PROTOCOL_TYPE_MSGSYNC       = 4
 	PROTOCOL_TYPE_STREAM_RECORD = 80
+)
+
+const (
+	BODY_MAX_LEN = 1024 * 8
 )
 
 type Protocol struct {
@@ -49,6 +55,9 @@ func (pc *ProtocolCodec) Decode() (*Protocol, error) {
 	}
 	if err := binary.Read(pc.Reader, binary.BigEndian, &protocol.Length); err != nil {
 		return protocol, err
+	}
+	if protocol.Length > BODY_MAX_LEN {
+		return protocol, errors.New("protocol body lenth overflow!")
 	}
 	body := make([]byte, protocol.Length)
 	if err := binary.Read(pc.Reader, binary.BigEndian, body); err != nil {

@@ -43,10 +43,17 @@ func main() {
 	routerManager = NewRouterManager(len(config.RouterServer))
 
 	setupGateRpcServer()
-
+	setupWSServer()
 	t := new(TCPTransport)
 	t.Listen(config.Domain, config.Port)
 
+}
+
+func setupWSServer() {
+	go func() {
+		t := &WSTransport{}
+		t.Listen(config.Domain, config.Port+2)
+	}()
 }
 
 func setupGateRpcServer() {

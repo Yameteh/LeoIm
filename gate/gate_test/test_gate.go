@@ -1,22 +1,22 @@
 package main
 
 import (
-	"fmt"
-	"net"
 	"bytes"
 	"encoding/binary"
-	"time"
+	"fmt"
 	"math/rand"
+	"net"
+	"time"
 
 	"bufio"
-	"os"
-	"strings"
 	"encoding/json"
-	"net/http"
-	"strconv"
+	"io"
 	"io/ioutil"
 	"mime/multipart"
-	"io"
+	"net/http"
+	"os"
+	"strconv"
+	"strings"
 )
 
 type AuthRequest struct {
@@ -28,7 +28,7 @@ type AuthResponse struct {
 	Code   int
 	Nonce  string
 	Method string
-	Token string
+	Token  string
 }
 
 func ToBytes(p *Protocol) []byte {
@@ -41,19 +41,18 @@ func ToBytes(p *Protocol) []byte {
 }
 
 type MessageBody struct {
-	MsgType int
-	From string
-	To string
-	Time int64
+	MsgType  int
+	From     string
+	To       string
+	Time     int64
 	MimeType string
-	Content string
+	Content  string
 }
 
 type SyncResponse struct {
 	Server string
-	Time  int64
+	Time   int64
 }
-
 
 func GetRandomString(length int64) string {
 	str := "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -67,7 +66,7 @@ func GetRandomString(length int64) string {
 	return string(result)
 }
 
-const CONNECT_SERVER = "172.25.1.137:8979"
+const CONNECT_SERVER = "172.25.1.52:8979"
 
 func main() {
 	fmt.Println("gate test start")
@@ -80,17 +79,17 @@ func main() {
 	go func() {
 		for {
 			p, err := codec.Decode()
-			if (err != nil) {
+			if err != nil {
 				return
 			}
 			switch p.Type {
 			case 1:
 				reAuth(p)
 			case PROTOCOL_TYPE_MSGSYNC:
-				fmt.Println("msg sync ",p)
+				fmt.Println("msg sync ", p)
 				sync(p)
 			case PROTOCOL_TYPE_MSG:
-				fmt.Println("received msg ",p)
+				fmt.Println("received msg ", p)
 			}
 		}
 	}()
@@ -112,14 +111,14 @@ func main() {
 					}
 				case "msg":
 					if len(cmds) == 3 {
-						Msg(cmds[1],cmds[2])
-					}else {
+						Msg(cmds[1], cmds[2])
+					} else {
 						fmt.Println("ps : msg xx xxx")
 					}
 				case "file":
 					if len(cmds) == 3 {
-						msgFile(cmds[1],cmds[2])
-					}else {
+						msgFile(cmds[1], cmds[2])
+					} else {
 						fmt.Println("ps : file xx xxx")
 					}
 				}
@@ -129,34 +128,34 @@ func main() {
 	}
 }
 
-func msgFile(to string,file string) {
+func msgFile(to string, file string) {
 	bodyBuf := &bytes.Buffer{}
 	bodyWriter := multipart.NewWriter(bodyBuf)
 
-	fileWriter,err := bodyWriter.CreateFormFile("file",file)
+	fileWriter, err := bodyWriter.CreateFormFile("file", file)
 
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	f,err := os.Open(file)
+	f, err := os.Open(file)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	_,err = io.Copy(fileWriter,f)
+	_, err = io.Copy(fileWriter, f)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	bodyWriter.WriteField("user",to)
+	bodyWriter.WriteField("user", to)
 	contentType := bodyWriter.FormDataContentType()
 	bodyWriter.Close()
-	r,err := http.NewRequest("POST","http://localhost:9922/file",bodyBuf)
-	r.Header.Add("Authorization","Basic "+GetBase64(account+":"+token))
-	r.Header.Add("Content-Type",contentType)
-	_ , err = http.DefaultClient.Do(r)
+	r, err := http.NewRequest("POST", "http://localhost:9922/file", bodyBuf)
+	r.Header.Add("Authorization", "Basic "+GetBase64(account+":"+token))
+	r.Header.Add("Content-Type", contentType)
+	_, err = http.DefaultClient.Do(r)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -165,30 +164,29 @@ func msgFile(to string,file string) {
 
 func sync(p *Protocol) {
 	a := &SyncResponse{}
-	json.Unmarshal([]byte(p.Body),a)
-	url :=  fmt.Sprintf("http://%s/sync/",a.Server)
-	r,err  := http.NewRequest("GET",url,nil)
+	json.Unmarshal([]byte(p.Body), a)
+	url := fmt.Sprintf("http://%s/sync/", a.Server)
+	r, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		fmt.Println(err)
 	}
-	r.Header.Add("Authorization","Basic "+GetBase64(account+":"+token))
-	r.Header.Add("SyncTime",strconv.FormatInt(a.Time,10))
-	rsp,err  := http.DefaultClient.Do(r)
+	r.Header.Add("Authorization", "Basic "+GetBase64(account+":"+token))
+	r.Header.Add("SyncTime", strconv.FormatInt(a.Time, 10))
+	rsp, err := http.DefaultClient.Do(r)
 	if err != nil {
 		fmt.Println(err)
-	}else {
-		fmt.Println(rsp.StatusCode,rsp.ContentLength)
+	} else {
+		fmt.Println(rsp.StatusCode, rsp.ContentLength)
 		defer rsp.Body.Close()
-		a,err := ioutil.ReadAll(rsp.Body)
+		a, err := ioutil.ReadAll(rsp.Body)
 		if err == nil {
 			fmt.Println(string(a))
-		}else {
+		} else {
 			fmt.Println(err)
 		}
 
 	}
 }
-
 
 var account string
 var password string
@@ -223,30 +221,30 @@ func reAuth(in *Protocol) {
 		a.User = account
 		r := a.User + ":" + ar.Nonce + ":" + password
 		a.Response = r
-		fmt.Println("response ",a.Response)
+		fmt.Println("response ", a.Response)
 		p := CreateProtocolMsg(1, 0, a)
 		err := codec.Encode(p)
 		if err != nil {
 			fmt.Println(err)
 		}
-	}else if ar.Code == 200 {
-		fmt.Println("auth success token ",ar.Token)
+	} else if ar.Code == 200 {
+		fmt.Println("auth success token ", ar.Token)
 		token = ar.Token
-	}else if ar.Code == 402 {
+	} else if ar.Code == 402 {
 		fmt.Println("auth failed")
 	}
 }
 
-func Msg(uuid string,content string) {
+func Msg(uuid string, content string) {
 	message := new(MessageBody)
 	message.MsgType = 1
 	message.From = account
 	message.To = uuid
 	message.MimeType = "text/plain"
-	message.Time = time.Now().UnixNano()/1e6
-	fmt.Println("send time ",message.Time)
+	message.Time = time.Now().UnixNano() / 1e6
+	fmt.Println("send time ", message.Time)
 	message.Content = content
-	p := CreateProtocolMsg(1,PROTOCOL_TYPE_MSG,message)
+	p := CreateProtocolMsg(1, PROTOCOL_TYPE_MSG, message)
 	err := codec.Encode(p)
 	if err != nil {
 		fmt.Println(err)
