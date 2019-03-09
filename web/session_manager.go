@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo-contrib/session"
@@ -41,14 +39,12 @@ func (sm *SessionManager) IsNewSession(c echo.Context) bool {
 	if sess != nil {
 		ret = sess.IsNew
 	}
-	fmt.Println("isNewSession ", ret)
 	return ret
 }
 
 func (sm *SessionManager) Remove(c echo.Context) {
 	sess, _ := session.Get(SESSION_NAME, c)
 	if sess != nil && !sess.IsNew {
-		fmt.Println("Session remove")
 		sess.Options.MaxAge = -1
 		sess.Save(c.Request(), c.Response())
 	}

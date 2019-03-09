@@ -8,6 +8,7 @@ import (
 
 	"github.com/golang/glog"
 	"github.com/satori/go.uuid"
+	"golang.org/x/net/websocket"
 )
 
 const (
@@ -40,6 +41,28 @@ func (am *AgentManager) putUserAgent(ua *UserAgent) {
 	defer am.Unlock()
 	glog.Infof("user agent %s added", ua.User.Uuid)
 	am.agents[ua.User.Uuid] = ua
+	storeUA(ua)
+}
+
+func storeUA(ua *UserAgent) {
+	ou := new(OnlineUser)
+	ou.Account = ua.User.Uuid
+	ou.Domain = config.Domain
+	ou.LoginTime = time.Now().Unix()
+	ou.Level = 1
+	err := storeManager.Insert(ou)
+	if err != nil {
+		glog.Error(err)
+	}
+}
+
+func removeUA(ua *UserAgent) {
+	ou := new(OnlineUser)
+	ou.Account = ua.User.Uuid
+	err := storeManager.Delete(ou)
+	if err != nil {
+		glog.Error(err)
+	}
 }
 
 func (am *AgentManager) getUserAgent(uuid string) *UserAgent {
@@ -55,6 +78,7 @@ func (am *AgentManager) delUserAgent(ua *UserAgent) {
 		defer am.Unlock()
 		glog.Infof("user agent %s deleted", ua.User.Uuid)
 		delete(am.agents, ua.User.Uuid)
+		removeUA(ua)
 	}
 }
 
@@ -130,8 +154,11 @@ func (ua *UserAgent) Close() {
 	ua.Writer <- nil
 	ua.Conn.Close()
 	ua.Status = USER_STATUS_UNKOWN
-	ua.Closer <- 1
 	uaManager.delUserAgent(ua)
+	switch ua.Conn.(type) {
+	case *websocket.Conn:
+		ua.Closer <- 1
+	}
 }
 
 func (ua *UserAgent) Run() {

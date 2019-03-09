@@ -1,9 +1,10 @@
 package main
 
 import (
+	"strings"
+
 	"github.com/golang/glog"
 	"gopkg.in/ini.v1"
-	"strings"
 )
 
 const (
@@ -15,6 +16,11 @@ const (
 	INI_SECTION_REDIS   = "redis_server"
 	INI_SECTION_ROUTER  = "router_server"
 	INI_KEY_ADDRESS     = "domains"
+
+	INI_SECTION_MYSQL = "mysql_server"
+	INI_KEY_DB        = "database"
+	INI_KEY_USER      = "user"
+	INI_KEY_PASSWORD  = "password"
 )
 
 type Config struct {
@@ -25,6 +31,11 @@ type Config struct {
 	RedisPort    int
 	RouterServer []string
 	RpcPort      int
+	MysqlDomain  string
+	MysqlPort    int
+	MysqlDb      string
+	MysqlUser    string
+	MysqlPwd     string
 	file         *ini.File
 }
 
@@ -89,5 +100,39 @@ func (cfg *Config) Parse() {
 		} else {
 			glog.Error(err)
 		}
+	}
+
+	s = cfg.file.Section(INI_SECTION_MYSQL)
+	if s != nil {
+		if d, err := s.GetKey(INI_KEY_DOMAIN); err == nil {
+			cfg.MysqlDomain = d.String()
+		} else {
+			glog.Error(err)
+		}
+
+		if p, err := s.GetKey(INI_KEY_PORT); err == nil {
+			cfg.MysqlPort, _ = p.Int()
+		} else {
+			glog.Error(err)
+		}
+
+		if db, err := s.GetKey(INI_KEY_DB); err == nil {
+			cfg.MysqlDb = db.String()
+		} else {
+			glog.Error(err)
+		}
+
+		if u, err := s.GetKey(INI_KEY_USER); err == nil {
+			cfg.MysqlUser = u.String()
+		} else {
+			glog.Error(err)
+		}
+
+		if pwd, err := s.GetKey(INI_KEY_PASSWORD); err == nil {
+			cfg.MysqlPwd = pwd.String()
+		} else {
+			glog.Error(err)
+		}
+
 	}
 }

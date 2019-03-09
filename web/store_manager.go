@@ -1,7 +1,9 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	"time"
 
 	"github.com/golang/glog"
 
@@ -56,4 +58,40 @@ func (sm *StoreManager) CheckAdmin(a string, p string) bool {
 		return false
 	}
 	return has
+}
+
+func (sm *StoreManager) GetOnlineUsers(lastid int64, count int) ([]*TplUser, error) {
+	if sm.Engine != nil {
+		if sm.connected {
+			ou := new(OnlineUser)
+			users := make([]*TplUser, 0)
+			rows, err := sm.Engine.Where("id >?", lastid).Rows(ou)
+			if err != nil {
+				return users, nil
+			}
+			defer rows.Close()
+			for rows.Next() {
+				if err := rows.Scan(ou); err == nil {
+					users = append(users, getTplUser(ou))
+				}
+			}
+			return users, nil
+		} else {
+			return nil, errors.New("xorm query message when not connect database")
+		}
+	} else {
+		return nil, errors.New("xorm query message when engine is nil")
+	}
+}
+
+func getTplUser(ou *OnlineUser) *TplUser {
+	tu := new(TplUser)
+	tu.Account = ou.Account
+	tu.Domain = ou.Domain
+	if ou.Level == 1 {
+		tu.Level = "普通用户"
+	}
+	tu.LoginTime = time.Unix(ou.LoginTime, 0).String()
+	tu.State = "在线"
+	return tu
 }

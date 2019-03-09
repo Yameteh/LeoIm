@@ -18,8 +18,8 @@ func NewStoreManager() *StoreManager {
 }
 
 func (sm *StoreManager) Init() error {
-	connStr := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?sslmode=disable", config.MysqlUser,
-		config.MysqlPwd, config.Domain, config.MysqlPort, config.MysqlDb)
+	connStr := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8", config.MysqlUser,
+		config.MysqlPwd, config.MysqlDomain, config.MysqlPort, config.MysqlDb)
 	var err error = nil
 	sm.Engine, err = xorm.NewEngine("mysql", connStr)
 

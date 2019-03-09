@@ -61,8 +61,49 @@ func frontListen() {
 	e.GET("/dologin", DoLogin)
 	e.GET("/loginout", LoginOut)
 	e.GET("/index", Index)
+	e.GET("/account", Account)
+	e.GET("/message", Message)
+	e.GET("/console", Console)
+	e.GET("/about", About)
 	e.Use(session.Middleware(sessionManager.GetStore()))
 	e.Start(fmt.Sprintf("%s:%d", config.Domain, config.Port+1))
+}
+
+func Account(c echo.Context) error {
+	if !sessionManager.IsNewSession(c) {
+		users, err := storeManager.GetOnlineUsers(0, 0)
+		fmt.Println(len(users))
+		if err != nil {
+			glog.Error(err)
+		}
+		return c.Render(http.StatusOK, "account", users)
+	} else {
+		return c.Redirect(http.StatusTemporaryRedirect, "/login")
+	}
+}
+
+func Message(c echo.Context) error {
+	if !sessionManager.IsNewSession(c) {
+		return c.Render(http.StatusOK, "message", "")
+	} else {
+		return c.Redirect(http.StatusTemporaryRedirect, "/login")
+	}
+}
+
+func Console(c echo.Context) error {
+	if !sessionManager.IsNewSession(c) {
+		return c.Render(http.StatusOK, "console", "")
+	} else {
+		return c.Redirect(http.StatusTemporaryRedirect, "/login")
+	}
+}
+
+func About(c echo.Context) error {
+	if !sessionManager.IsNewSession(c) {
+		return c.Render(http.StatusOK, "about", "")
+	} else {
+		return c.Redirect(http.StatusTemporaryRedirect, "/login")
+	}
 }
 
 func Index(c echo.Context) error {

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net"
+	"os"
 	"time"
 
 	"bufio"
@@ -14,7 +15,6 @@ import (
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
-	"os"
 	"strconv"
 	"strings"
 )
@@ -70,7 +70,13 @@ const CONNECT_SERVER = "172.25.1.52:8979"
 
 func main() {
 	fmt.Println("gate test start")
-	conn, err := net.Dial("tcp", CONNECT_SERVER)
+	args := os.Args
+	if len(args) != 2 {
+		fmt.Println("connect server ip need")
+		return
+	}
+	server := args[1]
+	conn, err := net.Dial("tcp", server)
 	if err != nil {
 		fmt.Println("dial error : ", err)
 		return

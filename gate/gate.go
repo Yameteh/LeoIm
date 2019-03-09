@@ -24,6 +24,7 @@ const (
 var config *Config
 var uaManager *AgentManager
 var routerManager *RouterManager
+var storeManager *StoreManager
 
 func main() {
 	//init log
@@ -41,7 +42,11 @@ func main() {
 
 	uaManager = NewAgentManager()
 	routerManager = NewRouterManager(len(config.RouterServer))
-
+	storeManager = NewStoreManager()
+	err := storeManager.Init()
+	if err != nil {
+		glog.Error(err)
+	}
 	setupGateRpcServer()
 	setupWSServer()
 	t := new(TCPTransport)
